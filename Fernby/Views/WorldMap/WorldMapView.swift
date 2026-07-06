@@ -24,7 +24,7 @@ struct WorldMapView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 36) {
-                Text("Wonder Trail")
+                Text("Fernby")
                     .font(.system(size: 32, weight: .heavy, design: .rounded))
                     .padding(.top, 24)
 

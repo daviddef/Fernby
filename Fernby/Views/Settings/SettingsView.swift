@@ -38,7 +38,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Privacy & Data")
                 } footer: {
-                    Text("Everything WonderTrail knows about this child — quest progress, mastery, session history — stays on this device. Nothing is sent anywhere. This clears it and starts fresh, useful between test sessions with different children.")
+                    Text("Everything Fernby knows about this child — quest progress, mastery, session history — stays on this device. Nothing is sent anywhere. This clears it and starts fresh, useful between test sessions with different children.")
                 }
             }
             .navigationTitle("Settings")

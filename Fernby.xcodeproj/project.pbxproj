@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		3A0000000000000000000004 /* WonderTrail.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WonderTrail.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3A0000000000000000000004 /* Fernby.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fernby.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		3A000000000000000000000F /* WonderTrail */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = WonderTrail; sourceTree = "<group>"; };
+		3A000000000000000000000F /* Fernby */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Fernby; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,7 +28,7 @@
 		3A0000000000000000000002 = {
 			isa = PBXGroup;
 			children = (
-				3A000000000000000000000F /* WonderTrail */,
+				3A000000000000000000000F /* Fernby */,
 				3A0000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -36,7 +36,7 @@
 		3A0000000000000000000003 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3A0000000000000000000004 /* WonderTrail.app */,
+				3A0000000000000000000004 /* Fernby.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -44,9 +44,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3A0000000000000000000005 /* WonderTrail */ = {
+		3A0000000000000000000005 /* Fernby */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3A000000000000000000000A /* Build configuration list for PBXNativeTarget "WonderTrail" */;
+			buildConfigurationList = 3A000000000000000000000A /* Build configuration list for PBXNativeTarget "Fernby" */;
 			buildPhases = (
 				3A0000000000000000000006 /* Sources */,
 				3A0000000000000000000007 /* Frameworks */,
@@ -57,13 +57,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				3A000000000000000000000F /* WonderTrail */,
+				3A000000000000000000000F /* Fernby */,
 			);
-			name = WonderTrail;
+			name = Fernby;
 			packageProductDependencies = (
 			);
-			productName = WonderTrail;
-			productReference = 3A0000000000000000000004 /* WonderTrail.app */;
+			productName = Fernby;
+			productReference = 3A0000000000000000000004 /* Fernby.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -81,7 +81,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3A0000000000000000000009 /* Build configuration list for PBXProject "WonderTrail" */;
+			buildConfigurationList = 3A0000000000000000000009 /* Build configuration list for PBXProject "Fernby" */;
 			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -95,7 +95,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3A0000000000000000000005 /* WonderTrail */,
+				3A0000000000000000000005 /* Fernby */,
 			);
 		};
 /* End PBXProject section */
@@ -239,7 +239,7 @@
 				DEVELOPMENT_TEAM = L9SAXP2E2W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Wonder Trail";
+				INFOPLIST_KEY_CFBundleDisplayName = "Fernby";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -252,7 +252,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddefranceski.wondertrail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.daviddefranceski.fernby;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -269,7 +269,7 @@
 				DEVELOPMENT_TEAM = L9SAXP2E2W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Wonder Trail";
+				INFOPLIST_KEY_CFBundleDisplayName = "Fernby";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -282,7 +282,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.daviddefranceski.wondertrail;
+				PRODUCT_BUNDLE_IDENTIFIER = com.daviddefranceski.fernby;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -293,7 +293,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3A0000000000000000000009 /* Build configuration list for PBXProject "WonderTrail" */ = {
+		3A0000000000000000000009 /* Build configuration list for PBXProject "Fernby" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3A000000000000000000000B /* Debug */,
@@ -302,7 +302,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3A000000000000000000000A /* Build configuration list for PBXNativeTarget "WonderTrail" */ = {
+		3A000000000000000000000A /* Build configuration list for PBXNativeTarget "Fernby" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3A000000000000000000000D /* Debug */,

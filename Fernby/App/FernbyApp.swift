@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct WonderTrailApp: App {
+struct FernbyApp: App {
     init() {
         #if DEBUG
         DebugSeed.applyIfRequested()

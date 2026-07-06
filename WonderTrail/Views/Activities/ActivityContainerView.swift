@@ -28,31 +28,24 @@ struct ActivityContainerView: View {
             switch node.activityKind {
             case .letterSoundMatch:
                 LetterSoundMatchView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .wordBuilding:
+                WordBuildingView(nodeID: node.id, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .sightWordTap:
+                SightWordTapView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .sentenceBuild:
+                SentenceBuildView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .countingTap:
+                CountingTapView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .numberIDTap:
+                NumberIDTapView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .additionTap:
                 AdditionTapView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
-            case .wordBuilding, .sightWordTap, .sentenceBuild, .countingTap, .numberIDTap, .subtractionTap, .wordProblemStep:
-                // Not built yet (v0.2) — placeholder so the chain never dead-ends.
-                ComingSoonActivityView(node: node, onAdvance: onAdvance)
+            case .subtractionTap:
+                SubtractionTapView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .wordProblemStep:
+                WordProblemStepView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             }
         }
         .id(node.id) // fresh identity per node so activity state resets between probes
-    }
-}
-
-/// Stand-in for activity kinds not yet implemented (v0.2). Auto-advances so
-/// the daily quest / placement flow can still be exercised end to end while
-/// content is being built out.
-private struct ComingSoonActivityView: View {
-    let node: SkillNode
-    let onAdvance: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("\(node.title) is on the way!")
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-            Button("Continue") { onAdvance() }
-                .buttonStyle(.bigTap)
-        }
-        .padding()
     }
 }

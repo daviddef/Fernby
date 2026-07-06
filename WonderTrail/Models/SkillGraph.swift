@@ -2,9 +2,7 @@ import Foundation
 
 /// The two skill chains a learner progresses through. Each chain is a simple
 /// ordered list, not a general graph — one node unlocks the next in the same
-/// subject, nothing branches. v0.1 only ships playable activities for
-/// `reading.letterSounds` and `math.addition`; the rest of the chain exists so
-/// placement and the world map have real structure to grow into.
+/// subject, nothing branches.
 enum SkillGraph {
     static let reading: [SkillNode] = [
         SkillNode(id: "reading.letterSounds", subject: .reading, title: "Letter Sounds", order: 0, activityKind: .letterSoundMatch),
@@ -24,9 +22,11 @@ enum SkillGraph {
 
     static var all: [SkillNode] { reading + math }
 
-    /// Nodes with a shipped, playable activity view. Everything else in the
-    /// chain exists as data but isn't reachable in v0.1.
-    static let playableIDs: Set<String> = ["reading.letterSounds", "math.addition"]
+    /// Nodes with a shipped, playable activity view. As of Phase 1 that's
+    /// every node in both chains — kept as an explicit set (rather than
+    /// implied by `all`) so a future node can still be added as data before
+    /// its activity view exists, the way this whole chain started.
+    static let playableIDs: Set<String> = Set(all.map(\.id))
 
     static func chain(for subject: Subject) -> [SkillNode] {
         subject == .reading ? reading : math

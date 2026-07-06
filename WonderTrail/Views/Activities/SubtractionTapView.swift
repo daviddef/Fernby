@@ -1,15 +1,16 @@
 import SwiftUI
 
-/// The "calculation drill" activity type — kept deliberately spare (static
-/// equation, no timer, minimal motion) per the finding that attention/focus
-/// predicts calculation performance more than number sense itself, so the
-/// UI shouldn't compete for that attention.
-struct AdditionTapView: View {
+/// Mirrors AdditionTapView's contract and spare, static visual style exactly
+/// — same reasoning about attention/focus applies. The one addition:
+/// concrete counters show the starting count with the "taken away" amount
+/// crossed out rather than removed, so subtraction reads as a visible
+/// transformation of the same dots, not a second unrelated group.
+struct SubtractionTapView: View {
     let difficultyLevel: Int
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var fact = MathFact(a: 1, b: 1, operation: .add)
+    @State private var fact = MathFact(a: 1, b: 1, operation: .subtract)
     @State private var choices: [Int] = []
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
@@ -17,14 +18,8 @@ struct AdditionTapView: View {
 
     var body: some View {
         VStack(spacing: 28) {
-            if max(fact.a, fact.b) <= 10 {
-                // Concrete counters at low difficulty; fades out at higher
-                // levels once the symbolic equation alone is the point.
-                HStack(spacing: 24) {
-                    DotGroup(count: fact.a, color: .blue)
-                    Text("+").font(.system(size: 28, weight: .bold, design: .rounded))
-                    DotGroup(count: fact.b, color: .orange)
-                }
+            if fact.a <= 10 {
+                DotGroup(count: fact.a, color: .blue, crossedOutIndices: Set(0..<max(fact.b, 0)))
             }
 
             Text("\(fact.displayText) = ?")
@@ -49,7 +44,7 @@ struct AdditionTapView: View {
     }
 
     private func setUpQuestion() {
-        fact = MathFactBank.randomFact(forDifficulty: difficultyLevel, operation: .add)
+        fact = MathFactBank.randomFact(forDifficulty: difficultyLevel, operation: .subtract)
         let distractors = MathFactBank.distractors(for: fact, count: 2)
         choices = ([fact.answer] + distractors).shuffled()
         hasRespondedFirstTime = false

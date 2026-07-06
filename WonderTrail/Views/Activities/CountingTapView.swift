@@ -1,34 +1,35 @@
 import SwiftUI
 
-/// The "calculation drill" activity type — kept deliberately spare (static
-/// equation, no timer, minimal motion) per the finding that attention/focus
-/// predicts calculation performance more than number sense itself, so the
-/// UI shouldn't compete for that attention.
-struct AdditionTapView: View {
+/// The first math node a learner ever sees. Objects are shown, not
+/// abstracted into dots — counting real-feeling things (apples, stars)
+/// before the equation-and-dot pairing addition introduces later.
+struct CountingTapView: View {
     let difficultyLevel: Int
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var fact = MathFact(a: 1, b: 1, operation: .add)
+    private static let objectEmoji = ["🍎", "⭐️", "🍓", "🐚", "🎈"]
+
+    @State private var target = 1
     @State private var choices: [Int] = []
+    @State private var emoji = "🍎"
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
 
+    private let columns = [GridItem(.adaptive(minimum: 44, maximum: 44), spacing: 8)]
+
     var body: some View {
         VStack(spacing: 28) {
-            if max(fact.a, fact.b) <= 10 {
-                // Concrete counters at low difficulty; fades out at higher
-                // levels once the symbolic equation alone is the point.
-                HStack(spacing: 24) {
-                    DotGroup(count: fact.a, color: .blue)
-                    Text("+").font(.system(size: 28, weight: .bold, design: .rounded))
-                    DotGroup(count: fact.b, color: .orange)
+            LazyVGrid(columns: columns, spacing: 8) {
+                ForEach(0..<target, id: \.self) { _ in
+                    Text(emoji).font(.system(size: 36))
                 }
             }
+            .frame(maxWidth: 260)
 
-            Text("\(fact.displayText) = ?")
-                .font(.system(size: 44, weight: .heavy, design: .rounded))
+            Text("How many are there?")
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
 
             HStack(spacing: 16) {
                 ForEach(choices, id: \.self) { choice in
@@ -43,23 +44,24 @@ struct AdditionTapView: View {
     }
 
     private func tint(for choice: Int) -> Color {
-        if justAnsweredCorrectly, choice == fact.answer { return .green }
+        if justAnsweredCorrectly, choice == target { return .green }
         if wrongChoice == choice { return .orange.opacity(0.7) }
         return .accentColor
     }
 
     private func setUpQuestion() {
-        fact = MathFactBank.randomFact(forDifficulty: difficultyLevel, operation: .add)
-        let distractors = MathFactBank.distractors(for: fact, count: 2)
-        choices = ([fact.answer] + distractors).shuffled()
+        let (newTarget, newChoices) = NumberBank.randomTarget(forDifficulty: difficultyLevel)
+        target = newTarget
+        choices = newChoices
+        emoji = Self.objectEmoji.randomElement() ?? "🍎"
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongChoice = nil
-        Voice.shared.speak("\(fact.spokenText)?", interrupt: true)
+        Voice.shared.speak("How many are there?", interrupt: true)
     }
 
     private func tapped(_ choice: Int) {
-        let correct = choice == fact.answer
+        let correct = choice == target
         if !hasRespondedFirstTime {
             hasRespondedFirstTime = true
             onFirstResponse(correct)
@@ -68,14 +70,14 @@ struct AdditionTapView: View {
         if correct {
             justAnsweredCorrectly = true
             Haptics.shared.correct()
-            Voice.shared.speak("That's right! \(fact.spokenText) is \(fact.answer).")
+            Voice.shared.speak("Yes! \(NumberBank.word(for: target))!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
                 onAdvance()
             }
         } else {
             wrongChoice = choice
             Haptics.shared.tryAgain()
-            Voice.shared.speak("Not quite — let's try again.")
+            Voice.shared.speak("Let's count again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongChoice = nil
             }

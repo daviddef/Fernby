@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// The "calculation drill" activity type — kept deliberately spare (static
-/// equation, no timer, minimal motion) per the finding that attention/focus
-/// predicts calculation performance more than number sense itself, so the
-/// UI shouldn't compete for that attention.
-struct AdditionTapView: View {
+/// Bridges counting objects (the previous node) to reading bare equations
+/// (the next node, addition): here the number is only ever spoken as a
+/// word, never shown as a numeral, so matching numeral-to-word is the
+/// isolated skill — no counting scaffold to lean on.
+struct NumberIDTapView: View {
     let difficultyLevel: Int
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var fact = MathFact(a: 1, b: 1, operation: .add)
+    @State private var target = 1
     @State private var choices: [Int] = []
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
@@ -17,18 +17,9 @@ struct AdditionTapView: View {
 
     var body: some View {
         VStack(spacing: 28) {
-            if max(fact.a, fact.b) <= 10 {
-                // Concrete counters at low difficulty; fades out at higher
-                // levels once the symbolic equation alone is the point.
-                HStack(spacing: 24) {
-                    DotGroup(count: fact.a, color: .blue)
-                    Text("+").font(.system(size: 28, weight: .bold, design: .rounded))
-                    DotGroup(count: fact.b, color: .orange)
-                }
-            }
-
-            Text("\(fact.displayText) = ?")
-                .font(.system(size: 44, weight: .heavy, design: .rounded))
+            Text("Which number is \"\(NumberBank.word(for: target))\"?")
+                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .multilineTextAlignment(.center)
 
             HStack(spacing: 16) {
                 ForEach(choices, id: \.self) { choice in
@@ -43,23 +34,23 @@ struct AdditionTapView: View {
     }
 
     private func tint(for choice: Int) -> Color {
-        if justAnsweredCorrectly, choice == fact.answer { return .green }
+        if justAnsweredCorrectly, choice == target { return .green }
         if wrongChoice == choice { return .orange.opacity(0.7) }
         return .accentColor
     }
 
     private func setUpQuestion() {
-        fact = MathFactBank.randomFact(forDifficulty: difficultyLevel, operation: .add)
-        let distractors = MathFactBank.distractors(for: fact, count: 2)
-        choices = ([fact.answer] + distractors).shuffled()
+        let (newTarget, newChoices) = NumberBank.randomTarget(forDifficulty: difficultyLevel)
+        target = newTarget
+        choices = newChoices
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongChoice = nil
-        Voice.shared.speak("\(fact.spokenText)?", interrupt: true)
+        Voice.shared.speak("Which number is \(NumberBank.word(for: target))?", interrupt: true)
     }
 
     private func tapped(_ choice: Int) {
-        let correct = choice == fact.answer
+        let correct = choice == target
         if !hasRespondedFirstTime {
             hasRespondedFirstTime = true
             onFirstResponse(correct)
@@ -68,14 +59,14 @@ struct AdditionTapView: View {
         if correct {
             justAnsweredCorrectly = true
             Haptics.shared.correct()
-            Voice.shared.speak("That's right! \(fact.spokenText) is \(fact.answer).")
+            Voice.shared.speak("Yes! That's \(target).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
                 onAdvance()
             }
         } else {
             wrongChoice = choice
             Haptics.shared.tryAgain()
-            Voice.shared.speak("Not quite — let's try again.")
+            Voice.shared.speak("Let's try again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongChoice = nil
             }

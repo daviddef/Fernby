@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!--
+	Fernby makes no network calls and has no third-party dependencies —
+	nothing here is transmitted off the device, so NSPrivacyCollectedDataTypes
+	is empty and tracking is false. The one Required Reason API this app
+	calls directly is UserDefaults (ProgressStore, SessionLog, Voice,
+	Haptics, and the Settings screen's @AppStorage toggles), all reading and
+	writing information that's only ever accessible to this app itself —
+	reason CA92.1. Confirmed by grepping the whole target for every
+	Required Reason API category (UserDefaults, file timestamps, system
+	boot time, disk space, active keyboard) before writing this file.
+	-->
+	<key>NSPrivacyTracking</key>
+	<false/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array/>
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array/>
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<string>CA92.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>

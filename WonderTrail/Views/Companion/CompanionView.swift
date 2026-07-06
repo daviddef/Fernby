@@ -27,5 +27,7 @@ struct CompanionView: View {
                     .foregroundStyle(.secondary)
             }
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(showsName ? "Your companion, \(stage.name)" : "Your companion")
     }
 }

@@ -16,10 +16,14 @@ final class Haptics {
     private let light = UIImpactFeedbackGenerator(style: .light)
     private let notify = UINotificationFeedbackGenerator()
 
-    /// Master switch — wire to a settings toggle later.
-    var enabled = true
+    /// Master switch, wired to the Settings screen's "Gentle taps" toggle.
+    var enabled: Bool {
+        didSet { UserDefaults.standard.set(enabled, forKey: "wt.hapticsEnabled") }
+    }
 
-    private init() {}
+    private init() {
+        enabled = UserDefaults.standard.object(forKey: "wt.hapticsEnabled") as? Bool ?? true
+    }
 
     func prepareAll() {
         guard enabled else { return }

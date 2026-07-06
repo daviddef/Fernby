@@ -38,5 +38,9 @@ struct BiomeNodeView: View {
         .buttonStyle(.plain)
         .disabled(isLocked)
         .onAppear { breathing = true }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(isLocked ? "\(title), locked" : title)
+        .accessibilityHint(isLocked ? "Keep learning to unlock this place." : "Double tap to start your quest.")
+        .accessibilityAddTraits(.isButton)
     }
 }

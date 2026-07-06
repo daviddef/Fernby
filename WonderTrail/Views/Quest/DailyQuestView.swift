@@ -9,6 +9,7 @@ final class DailyQuestViewModel: ObservableObject {
     @Published var currentIndex: Int = 0
     @Published var sessionCorrectCount: Int = 0
     let activities: [SkillNode]
+    let startedAt = Date()
 
     init() {
         // v0.1: reading + math only, each the learner's current (first
@@ -36,6 +37,7 @@ struct DailyQuestView: View {
 
     @StateObject private var viewModel = DailyQuestViewModel()
     @State private var justMasteredNodeID: String?
+    @State private var hasLoggedSession = false
 
     var body: some View {
         Group {
@@ -62,8 +64,20 @@ struct DailyQuestView: View {
                     masteredNodeTitle: SkillGraph.node(id: justMasteredNodeID ?? "")?.title,
                     onDone: onComplete
                 )
+                .onAppear { logSessionIfNeeded() }
             }
         }
         .onAppear { Haptics.shared.prepareAll() }
+    }
+
+    private func logSessionIfNeeded() {
+        guard !hasLoggedSession else { return }
+        hasLoggedSession = true
+        SessionLog.shared.record(SessionEntry(
+            nodeIDs: viewModel.activities.map(\.id),
+            correctCount: viewModel.sessionCorrectCount,
+            totalCount: viewModel.activities.count,
+            durationSeconds: Date().timeIntervalSince(viewModel.startedAt)
+        ))
     }
 }

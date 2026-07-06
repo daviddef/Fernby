@@ -16,9 +16,13 @@ final class Voice {
     static let shared = Voice()
 
     private let synthesizer = AVSpeechSynthesizer()
-    var enabled = true
+    var enabled: Bool {
+        didSet { UserDefaults.standard.set(enabled, forKey: "wt.voiceEnabled") }
+    }
 
-    private init() {}
+    private init() {
+        enabled = UserDefaults.standard.object(forKey: "wt.voiceEnabled") as? Bool ?? true
+    }
 
     func speak(_ text: String, interrupt: Bool = true) {
         guard enabled else { return }

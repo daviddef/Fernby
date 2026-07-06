@@ -1,8 +1,9 @@
 import SwiftUI
 
-/// Home screen. v0.1 ships a single biome — the world map grows to
-/// multiple unlockable biomes in v0.2. Tapping the biome routes to
-/// PlacementQuestView on first launch, DailyQuestView after that.
+/// Home screen. Every biome currently opens the same reading/math quest pool
+/// (see Biome.swift) — the map itself is the thing being tested for whether
+/// visible unlockable places pull a second session, ahead of biome-specific
+/// content existing to back it up.
 struct WorldMapView: View {
     private enum Flow: Identifiable {
         case placement
@@ -12,26 +13,49 @@ struct WorldMapView: View {
 
     @ObservedObject private var progressStore = ProgressStore.shared
     @State private var presentedFlow: Flow?
+    @State private var showingParentGate = false
+    @State private var showingSettings = false
+
+    private var unlockedBiomesInOrder: [Biome] {
+        Biome.all.filter { $0.isUnlocked(progressStore) }
+    }
 
     var body: some View {
-        VStack(spacing: 36) {
-            Text("Wonder Trail")
-                .font(.system(size: 32, weight: .heavy, design: .rounded))
-                .padding(.top, 24)
+        ScrollView {
+            VStack(spacing: 36) {
+                Text("Wonder Trail")
+                    .font(.system(size: 32, weight: .heavy, design: .rounded))
+                    .padding(.top, 24)
 
-            CompanionView(progressStore: progressStore, size: 160, showsName: true)
+                CompanionView(progressStore: progressStore, size: 160, showsName: true)
 
-            BiomeNodeView(
-                title: "Whispering Woods",
-                emoji: "🌳",
-                isLocked: false,
-                isCurrent: true,
-                action: startQuest
-            )
+                VStack(spacing: 24) {
+                    ForEach(Biome.all) { biome in
+                        let isUnlocked = biome.isUnlocked(progressStore)
+                        BiomeNodeView(
+                            title: biome.title,
+                            emoji: biome.emoji,
+                            isLocked: !isUnlocked,
+                            isCurrent: isUnlocked && biome.id == unlockedBiomesInOrder.last?.id,
+                            action: { startQuest() }
+                        )
+                    }
+                }
 
-            Spacer()
+                Spacer()
+            }
+            .padding()
         }
-        .padding()
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingParentGate = true
+                } label: {
+                    Image(systemName: "gearshape.fill")
+                }
+                .accessibilityLabel("Settings, grown-ups only")
+            }
+        }
         .fullScreenCover(item: $presentedFlow) { flow in
             switch flow {
             case .placement:
@@ -39,6 +63,19 @@ struct WorldMapView: View {
             case .daily:
                 DailyQuestView(onComplete: { presentedFlow = nil })
             }
+        }
+        .sheet(isPresented: $showingParentGate) {
+            ParentGateView(
+                onPassed: {
+                    showingParentGate = false
+                    showingSettings = true
+                },
+                onCancel: { showingParentGate = false }
+            )
+            .presentationDetents([.medium])
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(onDismiss: { showingSettings = false })
         }
     }
 

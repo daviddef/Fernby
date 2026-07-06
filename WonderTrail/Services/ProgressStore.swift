@@ -73,6 +73,18 @@ final class ProgressStore: ObservableObject {
         profiles[index].hasCompletedPlacement = true
     }
 
+    /// Wipes learning progress and companion growth for the active profile —
+    /// used by Settings' "Delete data on this device" control, and handy for
+    /// resetting between playtest children on a shared test device. Does not
+    /// touch the profile's name/id, only what it has done.
+    func resetActiveProfileData() {
+        nodeProgress = [:]
+        companion = CompanionState()
+        if let index = profiles.firstIndex(where: { $0.id == activeProfileID }) {
+            profiles[index].hasCompletedPlacement = false
+        }
+    }
+
     func recordActivityCompleted() {
         companion.totalActivitiesCompleted += 1
         companion.daysPlayed.insert(Self.todayKey())

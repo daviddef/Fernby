@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// A short daily quest: one reading activity, one math activity (v0.1 —
-/// v0.2 adds a third, blended word-problem activity once WordProblemStep
-/// ships). `ActivityContainerView` is the only place that knows how to
-/// render a given node; this view just sequences nodes and records results.
+/// A short daily quest: one reading activity, one math activity, each the
+/// learner's current node in its chain. `ActivityContainerView` is the only
+/// place that knows how to render a given node; this view just sequences
+/// nodes and records results.
 @MainActor
 final class DailyQuestViewModel: ObservableObject {
     @Published var currentIndex: Int = 0
@@ -38,6 +38,8 @@ struct DailyQuestView: View {
     @StateObject private var viewModel = DailyQuestViewModel()
     @State private var justMasteredNodeID: String?
     @State private var hasLoggedSession = false
+    @State private var coachMomentNode: SkillNode?
+    @State private var hasShownCoachMoment = false
 
     var body: some View {
         Group {
@@ -57,6 +59,8 @@ struct DailyQuestView: View {
                         viewModel.advance()
                     }
                 )
+            } else if let coachNode = coachMomentNode, !hasShownCoachMoment {
+                CoachMomentView(node: coachNode, onDone: { hasShownCoachMoment = true })
             } else {
                 QuestSummaryView(
                     correctCount: viewModel.sessionCorrectCount,
@@ -67,7 +71,10 @@ struct DailyQuestView: View {
                 .onAppear { logSessionIfNeeded() }
             }
         }
-        .onAppear { Haptics.shared.prepareAll() }
+        .onAppear {
+            Haptics.shared.prepareAll()
+            coachMomentNode = ReviewScheduler.dueNode()
+        }
     }
 
     private func logSessionIfNeeded() {

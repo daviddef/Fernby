@@ -15,6 +15,7 @@ struct WorldMapView: View {
     @State private var presentedFlow: Flow?
     @State private var showingParentGate = false
     @State private var showingSettings = false
+    @State private var showingJournal = false
 
     private var unlockedBiomesInOrder: [Biome] {
         Biome.all.filter { $0.isUnlocked(progressStore) }
@@ -27,7 +28,14 @@ struct WorldMapView: View {
                     .font(.system(size: 32, weight: .heavy, design: .rounded))
                     .padding(.top, 24)
 
-                CompanionView(progressStore: progressStore, size: 160, showsName: true)
+                Button {
+                    Haptics.shared.tap()
+                    showingJournal = true
+                } label: {
+                    CompanionView(progressStore: progressStore, size: 160, showsName: true)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Double tap to see what your companion has learned.")
 
                 VStack(spacing: 24) {
                     ForEach(Biome.all) { biome in
@@ -76,6 +84,9 @@ struct WorldMapView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(onDismiss: { showingSettings = false })
+        }
+        .sheet(isPresented: $showingJournal) {
+            CompanionJournalView(progressStore: progressStore)
         }
     }
 

@@ -12,6 +12,10 @@ struct NodeProgress: Codable {
     var difficultyLevel: Int = 1
     var mastered: Bool = false
     var masteredAt: Date?
+    /// When this node was last served as a Coach Moment review (see
+    /// ReviewScheduler). Optional so it decodes safely against progress
+    /// saved before this field existed — nil just means "never reviewed."
+    var lastReviewedAt: Date?
 
     init(nodeID: String) {
         self.nodeID = nodeID

@@ -18,6 +18,7 @@ struct WordBuildingView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongWord: String?
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 28) {
@@ -59,6 +60,7 @@ struct WordBuildingView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -75,6 +77,7 @@ struct WordBuildingView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongWord = nil
+        feedback = nil
 
         if isBlendingVariant {
             Voice.shared.speak("Listen: ", interrupt: true)
@@ -96,6 +99,7 @@ struct WordBuildingView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("Yes! \(target.word)!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -103,10 +107,12 @@ struct WordBuildingView: View {
             }
         } else {
             wrongWord = choice.word
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's try again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongWord = nil
+                feedback = nil
             }
         }
     }

@@ -20,6 +20,7 @@ struct SentenceBuildView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var showedWrongHint = false
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 28) {
@@ -48,6 +49,7 @@ struct SentenceBuildView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -128,18 +130,21 @@ struct SentenceBuildView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("Yes! \(sentence.spoken)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
                 onAdvance()
             }
         } else {
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's try that again.")
             showedWrongHint = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 trayWords = sentence.words.shuffled()
                 slots = Array(repeating: nil, count: sentence.words.count)
+                feedback = nil
             }
         }
     }
@@ -151,6 +156,7 @@ struct SentenceBuildView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         showedWrongHint = false
+        feedback = nil
         Voice.shared.speak("Build this sentence: \(sentence.spoken)", interrupt: true)
     }
 }

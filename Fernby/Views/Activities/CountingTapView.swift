@@ -16,6 +16,7 @@ struct CountingTapView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
+    @State private var feedback: AnswerFeedbackKind?
 
     private let columns = [GridItem(.adaptive(minimum: 44, maximum: 44), spacing: 8)]
 
@@ -40,6 +41,7 @@ struct CountingTapView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -57,6 +59,7 @@ struct CountingTapView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongChoice = nil
+        feedback = nil
         Voice.shared.speak("How many are there?", interrupt: true)
     }
 
@@ -69,6 +72,7 @@ struct CountingTapView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("Yes! \(NumberBank.word(for: target))!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -76,10 +80,12 @@ struct CountingTapView: View {
             }
         } else {
             wrongChoice = choice
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's count again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongChoice = nil
+                feedback = nil
             }
         }
     }

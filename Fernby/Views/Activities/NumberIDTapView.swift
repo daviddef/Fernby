@@ -14,6 +14,7 @@ struct NumberIDTapView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 28) {
@@ -30,6 +31,7 @@ struct NumberIDTapView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -46,6 +48,7 @@ struct NumberIDTapView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongChoice = nil
+        feedback = nil
         Voice.shared.speak("Which number is \(NumberBank.word(for: target))?", interrupt: true)
     }
 
@@ -58,6 +61,7 @@ struct NumberIDTapView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("Yes! That's \(target).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -65,10 +69,12 @@ struct NumberIDTapView: View {
             }
         } else {
             wrongChoice = choice
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's try again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongChoice = nil
+                feedback = nil
             }
         }
     }

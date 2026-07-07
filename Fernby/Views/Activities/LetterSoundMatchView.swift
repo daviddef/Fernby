@@ -13,6 +13,7 @@ struct LetterSoundMatchView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongLetter: String?
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 28) {
@@ -41,6 +42,7 @@ struct LetterSoundMatchView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -56,6 +58,7 @@ struct LetterSoundMatchView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongLetter = nil
+        feedback = nil
         Voice.shared.speak("What sound does this letter make?", interrupt: true)
         Voice.shared.speak(target.sound, interrupt: false)
     }
@@ -69,6 +72,7 @@ struct LetterSoundMatchView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("Yes! \(target.letter) says \(target.sound), like \(target.exampleWord)!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -76,10 +80,12 @@ struct LetterSoundMatchView: View {
             }
         } else {
             wrongLetter = choice.letter
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's try again. \(target.sound)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongLetter = nil
+                feedback = nil
             }
         }
     }

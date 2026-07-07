@@ -14,6 +14,7 @@ struct WordProblemStepView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 24) {
@@ -31,6 +32,7 @@ struct WordProblemStepView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -47,6 +49,7 @@ struct WordProblemStepView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongChoice = nil
+        feedback = nil
         Voice.shared.speak(problem.scenario, interrupt: true)
     }
 
@@ -59,6 +62,7 @@ struct WordProblemStepView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("That's right! The answer is \(problem.fact.answer).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -66,10 +70,12 @@ struct WordProblemStepView: View {
             }
         } else {
             wrongChoice = choice
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's think about it again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongChoice = nil
+                feedback = nil
             }
         }
     }

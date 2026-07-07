@@ -15,6 +15,7 @@ struct SubtractionTapView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 28) {
@@ -34,6 +35,7 @@ struct SubtractionTapView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -50,6 +52,7 @@ struct SubtractionTapView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongChoice = nil
+        feedback = nil
         Voice.shared.speak("\(fact.spokenText)?", interrupt: true)
     }
 
@@ -62,6 +65,7 @@ struct SubtractionTapView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("That's right! \(fact.spokenText) is \(fact.answer).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -69,10 +73,12 @@ struct SubtractionTapView: View {
             }
         } else {
             wrongChoice = choice
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Not quite — let's try again.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongChoice = nil
+                feedback = nil
             }
         }
     }

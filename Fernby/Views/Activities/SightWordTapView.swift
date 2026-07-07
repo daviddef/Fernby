@@ -13,6 +13,7 @@ struct SightWordTapView: View {
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
     @State private var wrongWord: String?
+    @State private var feedback: AnswerFeedbackKind?
 
     var body: some View {
         VStack(spacing: 28) {
@@ -35,6 +36,7 @@ struct SightWordTapView: View {
             }
         }
         .padding()
+        .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
@@ -51,6 +53,7 @@ struct SightWordTapView: View {
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongWord = nil
+        feedback = nil
         Voice.shared.speak(target, interrupt: true)
     }
 
@@ -63,6 +66,7 @@ struct SightWordTapView: View {
 
         if correct {
             justAnsweredCorrectly = true
+            feedback = .correct
             Haptics.shared.correct()
             Voice.shared.speak("Yes! That word is \(target).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
@@ -70,10 +74,12 @@ struct SightWordTapView: View {
             }
         } else {
             wrongWord = choice
+            feedback = .tryAgain
             Haptics.shared.tryAgain()
             Voice.shared.speak("Let's listen again. \(target)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
                 wrongWord = nil
+                feedback = nil
             }
         }
     }

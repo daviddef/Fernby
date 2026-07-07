@@ -37,6 +37,7 @@ struct DailyQuestView: View {
 
     @StateObject private var viewModel = DailyQuestViewModel()
     @State private var justMasteredNodeID: String?
+    @State private var justCompletedBiome: Biome?
     @State private var hasLoggedSession = false
     @State private var coachMomentNode: SkillNode?
     @State private var hasShownCoachMoment = false
@@ -51,6 +52,9 @@ struct DailyQuestView: View {
                         let justMastered = DifficultyEngine.recordResult(nodeID: node.id, correct: correct)
                         if justMastered {
                             justMasteredNodeID = node.id
+                            if let biome = Biome.biomeCompleted(by: node.id, in: ProgressStore.shared) {
+                                justCompletedBiome = biome
+                            }
                             Haptics.shared.masteryUnlock()
                         }
                     },
@@ -66,6 +70,7 @@ struct DailyQuestView: View {
                     correctCount: viewModel.sessionCorrectCount,
                     totalCount: viewModel.activities.count,
                     masteredNodeTitle: SkillGraph.node(id: justMasteredNodeID ?? "")?.title,
+                    justCompletedBiome: justCompletedBiome,
                     onDone: onComplete
                 )
                 .onAppear { logSessionIfNeeded() }

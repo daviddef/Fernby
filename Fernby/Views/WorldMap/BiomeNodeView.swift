@@ -6,6 +6,7 @@ import SwiftUI
 struct BiomeNodeView: View {
     let title: String
     let emoji: String
+    let accentColor: Color
     let isLocked: Bool
     let isCurrent: Bool
     let action: () -> Void
@@ -16,8 +17,8 @@ struct BiomeNodeView: View {
         Button(action: action) {
             VStack(spacing: 10) {
                 Circle()
-                    .fill(isLocked ? Color.secondary.opacity(0.2) : Color.accentColor.opacity(0.85))
-                    .frame(width: 132, height: 132)
+                    .fill(isLocked ? Color.secondary.opacity(0.2) : accentColor)
+                    .frame(width: 116, height: 116)
                     .overlay(
                         Text(emoji)
                             .font(.system(size: 56))

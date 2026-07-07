@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// Home screen. Every biome currently opens the same reading/math quest pool
-/// (see Biome.swift) — the map itself is the thing being tested for whether
-/// visible unlockable places pull a second session, ahead of biome-specific
-/// content existing to back it up.
+/// Home screen — a winding trail of five biomes, each a real gate on the
+/// skill graph (see Biome.swift), not five identical circles. The zigzag
+/// layout and dotted connectors are what make it read as a trail worth
+/// walking rather than a list worth scrolling past.
 struct WorldMapView: View {
     private enum Flow: Identifiable {
         case placement
@@ -23,7 +23,7 @@ struct WorldMapView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 36) {
+            VStack(spacing: 28) {
                 Text("Fernby")
                     .font(.system(size: 32, weight: .heavy, design: .rounded))
                     .padding(.top, 24)
@@ -32,27 +32,17 @@ struct WorldMapView: View {
                     Haptics.shared.tap()
                     showingJournal = true
                 } label: {
-                    CompanionView(progressStore: progressStore, size: 160, showsName: true)
+                    CompanionView(progressStore: progressStore, size: 150, showsName: true)
                 }
                 .buttonStyle(.plain)
                 .accessibilityHint("Double tap to see what your companion has learned.")
 
-                VStack(spacing: 24) {
-                    ForEach(Biome.all) { biome in
-                        let isUnlocked = biome.isUnlocked(progressStore)
-                        BiomeNodeView(
-                            title: biome.title,
-                            emoji: biome.emoji,
-                            isLocked: !isUnlocked,
-                            isCurrent: isUnlocked && biome.id == unlockedBiomesInOrder.last?.id,
-                            action: { startQuest() }
-                        )
-                    }
-                }
+                trail
+                    .padding(.top, 8)
 
-                Spacer()
+                Spacer(minLength: 24)
             }
-            .padding()
+            .padding(.horizontal)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -88,6 +78,46 @@ struct WorldMapView: View {
         .sheet(isPresented: $showingJournal) {
             CompanionJournalView(progressStore: progressStore)
         }
+    }
+
+    private var trail: some View {
+        VStack(spacing: 0) {
+            ForEach(Array(Biome.all.enumerated()), id: \.element.id) { index, biome in
+                let isUnlocked = biome.isUnlocked(progressStore)
+                biomeRow(biome, isUnlocked: isUnlocked, leansLeft: index % 2 == 0)
+
+                if index < Biome.all.count - 1 {
+                    trailConnector(isActive: isUnlocked)
+                }
+            }
+        }
+    }
+
+    private func biomeRow(_ biome: Biome, isUnlocked: Bool, leansLeft: Bool) -> some View {
+        HStack {
+            if !leansLeft { Spacer(minLength: 40) }
+            BiomeNodeView(
+                title: biome.title,
+                emoji: biome.emoji,
+                accentColor: biome.accentColor,
+                isLocked: !isUnlocked,
+                isCurrent: isUnlocked && biome.id == unlockedBiomesInOrder.last?.id,
+                action: { startQuest() }
+            )
+            if leansLeft { Spacer(minLength: 40) }
+        }
+    }
+
+    private func trailConnector(isActive: Bool) -> some View {
+        VStack(spacing: 6) {
+            ForEach(0..<3, id: \.self) { _ in
+                Circle()
+                    .fill(isActive ? Color.secondary.opacity(0.4) : Color.secondary.opacity(0.18))
+                    .frame(width: 6, height: 6)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 34)
     }
 
     private func startQuest() {

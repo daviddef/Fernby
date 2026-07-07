@@ -19,13 +19,14 @@ struct MathFact: Codable, Equatable {
 
 /// Math facts are combinatorial, so this bank generates rather than hand-lists
 /// entries — unlike the word banks, which are curated. Level 1 sums to 5,
-/// level 5 sums to 20; subtraction stays non-negative and borrow-free
-/// throughout so every fact is representable with simple counters.
+/// level 3 (DifficultyEngine.maxDifficulty) sums to 20; subtraction stays
+/// non-negative and borrow-free throughout so every fact is representable
+/// with simple counters.
 enum MathFactBank {
-    private static let maxSumByLevel = [1: 5, 2: 8, 3: 10, 4: 15, 5: 20]
+    private static let maxSumByLevel = [1: 5, 2: 10, 3: 20]
 
     static func facts(forDifficulty level: Int, operation: MathOperation) -> [MathFact] {
-        let clampedLevel = min(max(level, 1), 5)
+        let clampedLevel = min(max(level, 1), 3)
         let maxSum = maxSumByLevel[clampedLevel] ?? 5
         var facts: [MathFact] = []
         for a in 0...maxSum {

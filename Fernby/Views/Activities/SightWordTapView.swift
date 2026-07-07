@@ -1,14 +1,18 @@
 import SwiftUI
 
 /// Sight words are recognized whole, not sounded out, so this activity
-/// never shows the target printed until after the answer — the child hears
-/// the word and taps the printed word that matches, the reverse of
-/// LetterSoundMatchView's "see it, hear it" order.
+/// never shows the target *printed* until after the answer — the child
+/// hears the word and taps the printed word that matches, the reverse of
+/// LetterSoundMatchView's "see it, hear it" order. Printing the letters
+/// up front would just hand over the answer. A row of blank tiles matching
+/// the word's length gives a real non-verbal signal (how long is it?)
+/// without doing that — Voice can be muted and the activity still gives
+/// the child something concrete to check their guess against.
 struct SightWordTapView: View {
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var target = SightWordBank.random()
+    @State private var target = SightWordBank.random(avoiding: RecentItemTracker.shared.recent(for: "sightWords"))
     @State private var choices: [String] = []
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
@@ -19,6 +23,15 @@ struct SightWordTapView: View {
         VStack(spacing: 28) {
             Text("Tap the word you hear")
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
+
+            HStack(spacing: 6) {
+                ForEach(0..<target.count, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: 6, style: .continuous)
+                        .fill(Color.secondary.opacity(0.15))
+                        .frame(width: 24, height: 32)
+                }
+            }
+            .accessibilityHidden(true)
 
             Button {
                 Voice.shared.speak(target, interrupt: true)
@@ -36,18 +49,20 @@ struct SightWordTapView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
     private func tint(for choice: String) -> Color {
-        if justAnsweredCorrectly, choice == target { return .green }
-        if wrongWord == choice { return .orange.opacity(0.7) }
+        if justAnsweredCorrectly, choice == target { return .fernbyCorrect }
+        if wrongWord == choice { return .fernbyWrong }
         return .accentColor
     }
 
     private func setUpQuestion() {
-        target = SightWordBank.random()
+        target = SightWordBank.random(avoiding: RecentItemTracker.shared.recent(for: "sightWords"))
+        RecentItemTracker.shared.record(target, for: "sightWords")
         let decoys = SightWordBank.decoys(excluding: target, count: 2)
         choices = ([target] + decoys).shuffled()
         hasRespondedFirstTime = false

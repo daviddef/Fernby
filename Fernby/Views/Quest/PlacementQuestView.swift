@@ -21,6 +21,7 @@ struct PlacementQuestView: View {
 
                 ActivityContainerView(
                     node: node,
+                    instanceID: probeIndex,
                     onFirstResponse: { correct in
                         engine.recordProbeResult(subject: node.subject, firstTryCorrect: correct)
                     },

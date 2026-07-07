@@ -13,6 +13,9 @@ struct WordBuildingView: View {
 
     private var isBlendingVariant: Bool { nodeID == "reading.blending" }
 
+    // Can't reference `nodeID` (an instance member) in a property
+    // initializer — setUpQuestion(), called on appear, immediately
+    // overwrites this with the real avoiding-recent pick.
     @State private var target = WordBuildingBank.random()
     @State private var choices: [BuildableWord] = []
     @State private var hasRespondedFirstTime = false
@@ -60,18 +63,20 @@ struct WordBuildingView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
     private func tint(for choice: BuildableWord) -> Color {
-        if justAnsweredCorrectly, choice.word == target.word { return .green }
-        if wrongWord == choice.word { return .orange.opacity(0.7) }
+        if justAnsweredCorrectly, choice.word == target.word { return .fernbyCorrect }
+        if wrongWord == choice.word { return .fernbyWrong }
         return .accentColor
     }
 
     private func setUpQuestion() {
-        target = WordBuildingBank.random()
+        target = WordBuildingBank.random(avoiding: RecentItemTracker.shared.recent(for: nodeID))
+        RecentItemTracker.shared.record(target.word, for: nodeID)
         let decoys = WordBuildingBank.decoys(excluding: target, count: 2)
         choices = ([target] + decoys).shuffled()
         hasRespondedFirstTime = false

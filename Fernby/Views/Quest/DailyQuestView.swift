@@ -1,24 +1,28 @@
 import SwiftUI
 
-/// A short daily quest: one reading activity, one math activity, each the
-/// learner's current node in its chain. `ActivityContainerView` is the only
-/// place that knows how to render a given node; this view just sequences
-/// nodes and records results.
+/// A daily quest: the learner's current node in each chain, repeated
+/// `repsPerSubject` times and interleaved. `ActivityContainerView` is the
+/// only place that knows how to render a given node; this view just
+/// sequences steps and records results.
 @MainActor
 final class DailyQuestViewModel: ObservableObject {
+    /// Multiple reps per subject per quest, rather than one, so mastering a
+    /// node takes roughly one to two quests instead of the fifteen separate
+    /// sessions the old one-rep pacing needed (see DifficultyEngine).
+    /// Interleaved reading/math/reading/math/... rather than blocked, so a
+    /// longer quest still feels varied rather than "all reading then all
+    /// math."
+    static let repsPerSubject = 3
+
     @Published var currentIndex: Int = 0
     @Published var sessionCorrectCount: Int = 0
     let activities: [SkillNode]
     let startedAt = Date()
 
     init() {
-        // v0.1: reading + math only, each the learner's current (first
-        // non-mastered) node in its chain. A third, blended activity slot
-        // joins here once WordProblemStep is built (v0.2).
-        activities = [
-            ProgressStore.shared.currentNode(for: .reading),
-            ProgressStore.shared.currentNode(for: .math),
-        ]
+        let reading = ProgressStore.shared.currentNode(for: .reading)
+        let math = ProgressStore.shared.currentNode(for: .math)
+        activities = (0..<Self.repsPerSubject).flatMap { _ in [reading, math] }
     }
 
     var currentNode: SkillNode? {
@@ -36,8 +40,8 @@ struct DailyQuestView: View {
     let onComplete: () -> Void
 
     @StateObject private var viewModel = DailyQuestViewModel()
-    @State private var justMasteredNodeID: String?
-    @State private var justCompletedBiome: Biome?
+    @State private var justMasteredNodeIDs: [String] = []
+    @State private var justCompletedBiomes: [Biome] = []
     @State private var hasLoggedSession = false
     @State private var coachMomentNode: SkillNode?
     @State private var hasShownCoachMoment = false
@@ -47,13 +51,14 @@ struct DailyQuestView: View {
             if let node = viewModel.currentNode {
                 ActivityContainerView(
                     node: node,
+                    instanceID: viewModel.currentIndex,
                     onFirstResponse: { correct in
                         if correct { viewModel.sessionCorrectCount += 1 }
                         let justMastered = DifficultyEngine.recordResult(nodeID: node.id, correct: correct)
                         if justMastered {
-                            justMasteredNodeID = node.id
+                            justMasteredNodeIDs.append(node.id)
                             if let biome = Biome.biomeCompleted(by: node.id, in: ProgressStore.shared) {
-                                justCompletedBiome = biome
+                                justCompletedBiomes.append(biome)
                             }
                             Haptics.shared.masteryUnlock()
                         }
@@ -69,8 +74,8 @@ struct DailyQuestView: View {
                 QuestSummaryView(
                     correctCount: viewModel.sessionCorrectCount,
                     totalCount: viewModel.activities.count,
-                    masteredNodeTitle: SkillGraph.node(id: justMasteredNodeID ?? "")?.title,
-                    justCompletedBiome: justCompletedBiome,
+                    masteredNodeTitles: justMasteredNodeIDs.compactMap { SkillGraph.node(id: $0)?.title },
+                    justCompletedBiomes: justCompletedBiomes,
                     onDone: onComplete
                 )
                 .onAppear { logSessionIfNeeded() }

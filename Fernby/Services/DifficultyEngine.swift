@@ -1,9 +1,18 @@
 import Foundation
 
 /// Rule-based, per-item difficulty adjustment and mastery gate. No ML —
-/// three in a row correct steps difficulty up (and masters the node at the
+/// two in a row correct steps difficulty up (and masters the node at the
 /// top of its range); three in a row wrong gently steps difficulty back
 /// down. Never goes below level 1.
+///
+/// Originally masteryStreak=3, maxDifficulty=5 — 15 correct first-attempts
+/// to master one node, and a quest only gave one first-attempt per
+/// subject, so mastering a single node took 15 separate quest sessions.
+/// With 11 nodes total, later content (subtraction, sentences, the last
+/// two biomes) was practically unreachable in any real playtest. Now 6
+/// correct first-attempts per node (masteryStreak=2 × maxDifficulty=3),
+/// paired with multiple reps per subject per quest (see DailyQuestView),
+/// so a node masters in roughly one to two quests instead of fifteen.
 ///
 /// In-activity retries of the *same* question (see activity views) are not
 /// reported here as a fresh incorrect result — only the learner's first
@@ -12,9 +21,9 @@ import Foundation
 /// visually.
 @MainActor
 enum DifficultyEngine {
-    static let masteryStreak = 3
+    static let masteryStreak = 2
     static let demoteStreak = 3
-    static let maxDifficulty = 5
+    static let maxDifficulty = 3
     static let minDifficulty = 1
 
     /// Returns true if this result just mastered the node (i.e. unlocked the next one).

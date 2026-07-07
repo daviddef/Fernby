@@ -8,7 +8,7 @@ struct LetterSoundMatchView: View {
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var target = PhonicsBank.random()
+    @State private var target = PhonicsBank.random(avoiding: RecentItemTracker.shared.recent(for: "letterSounds"))
     @State private var choices: [LetterSoundEntry] = []
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
@@ -42,17 +42,19 @@ struct LetterSoundMatchView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
     private func tint(for choice: LetterSoundEntry) -> Color {
-        if justAnsweredCorrectly, choice.letter == target.letter { return .green }
-        if wrongLetter == choice.letter { return .orange.opacity(0.7) }
+        if justAnsweredCorrectly, choice.letter == target.letter { return .fernbyCorrect }
+        if wrongLetter == choice.letter { return .fernbyWrong }
         return .accentColor
     }
 
     private func setUpQuestion() {
+        RecentItemTracker.shared.record(target.letter, for: "letterSounds")
         let decoys = PhonicsBank.decoys(excluding: target, count: 2)
         choices = ([target] + decoys).shuffled()
         hasRespondedFirstTime = false

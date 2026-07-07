@@ -7,6 +7,7 @@ enum Subject: String, Codable {
 
 /// Which activity view renders a given skill node.
 enum ActivityKind: String, Codable {
+    case letterTracing
     case letterSoundMatch
     case wordBuilding
     case sightWordTap

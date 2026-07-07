@@ -79,15 +79,3 @@ struct ParentDashboardView: View {
         return "\(totalSeconds / 60)m \(totalSeconds % 60)s"
     }
 }
-
-private extension Array where Element == String {
-    /// "a, b, and c" — natural-language joining for the narrated summary.
-    func formattedList() -> String {
-        switch count {
-        case 0: return ""
-        case 1: return self[0]
-        case 2: return "\(self[0]) and \(self[1])"
-        default: return dropLast().joined(separator: ", ") + ", and \(last!)"
-        }
-    }
-}

@@ -11,10 +11,11 @@ enum NumberBank {
     ]
 
     /// The highest number in play at a given difficulty level — starts at 5
-    /// objects/numerals and opens up to the full 1...10 range by level 5.
+    /// objects/numerals and opens up to the full 1...10 range by level 3
+    /// (DifficultyEngine.maxDifficulty).
     static func maxNumber(forDifficulty level: Int) -> Int {
-        let clamped = min(max(level, 1), 5)
-        return [1: 5, 2: 6, 3: 8, 4: 9, 5: 10][clamped] ?? 5
+        let clamped = min(max(level, 1), 3)
+        return [1: 5, 2: 8, 3: 10][clamped] ?? 5
     }
 
     static func word(for number: Int) -> String {

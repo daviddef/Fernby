@@ -16,11 +16,12 @@ struct SubtractionTapView: View {
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
     @State private var feedback: AnswerFeedbackKind?
+    @State private var objectEmoji = FunObjectBank.random()
 
     var body: some View {
         VStack(spacing: 28) {
             if fact.a <= 10 {
-                DotGroup(count: fact.a, color: .blue, crossedOutIndices: Set(0..<max(fact.b, 0)))
+                DotGroup(count: fact.a, emoji: objectEmoji, crossedOutIndices: Set(0..<max(fact.b, 0)))
             }
 
             Text("\(fact.displayText) = ?")
@@ -35,13 +36,14 @@ struct SubtractionTapView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
     private func tint(for choice: Int) -> Color {
-        if justAnsweredCorrectly, choice == fact.answer { return .green }
-        if wrongChoice == choice { return .orange.opacity(0.7) }
+        if justAnsweredCorrectly, choice == fact.answer { return .fernbyCorrect }
+        if wrongChoice == choice { return .fernbyWrong }
         return .accentColor
     }
 
@@ -53,6 +55,7 @@ struct SubtractionTapView: View {
         justAnsweredCorrectly = false
         wrongChoice = nil
         feedback = nil
+        objectEmoji = FunObjectBank.random()
         Voice.shared.speak("\(fact.spokenText)?", interrupt: true)
     }
 

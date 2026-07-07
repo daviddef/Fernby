@@ -19,6 +19,7 @@ enum CompanionAbilityCatalog {
     static let companionName = "Fern"
 
     static let all: [CompanionAbility] = [
+        CompanionAbility(nodeID: "reading.letterTracing", verb: "trace the shape of a letter"),
         CompanionAbility(nodeID: "reading.letterSounds", verb: "say letter sounds out loud"),
         CompanionAbility(nodeID: "reading.blending", verb: "blend sounds into a word"),
         CompanionAbility(nodeID: "reading.sightWords", verb: "read tricky words on sight"),

@@ -31,13 +31,14 @@ struct NumberIDTapView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
     private func tint(for choice: Int) -> Color {
-        if justAnsweredCorrectly, choice == target { return .green }
-        if wrongChoice == choice { return .orange.opacity(0.7) }
+        if justAnsweredCorrectly, choice == target { return .fernbyCorrect }
+        if wrongChoice == choice { return .fernbyWrong }
         return .accentColor
     }
 

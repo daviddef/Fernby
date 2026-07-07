@@ -14,6 +14,13 @@ import SwiftUI
 ///   just ask the same question again.
 struct ActivityContainerView: View {
     let node: SkillNode
+    /// Uniquely identifies this occurrence, distinct from `node.id` — a
+    /// quest can serve the same node more than once in a row (multiple
+    /// reps per subject, or a placement probe that repeats after a miss),
+    /// and keying `.id()` on `node.id` alone would make SwiftUI treat two
+    /// consecutive reps of the same node as the same view instance, so
+    /// `onAppear` (and the fresh question it sets up) wouldn't refire.
+    let instanceID: AnyHashable
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
@@ -26,6 +33,8 @@ struct ActivityContainerView: View {
     var body: some View {
         Group {
             switch node.activityKind {
+            case .letterTracing:
+                LetterTracingView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .letterSoundMatch:
                 LetterSoundMatchView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .wordBuilding:
@@ -46,6 +55,6 @@ struct ActivityContainerView: View {
                 WordProblemStepView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             }
         }
-        .id(node.id) // fresh identity per node so activity state resets between probes
+        .id(instanceID) // fresh identity per occurrence, even repeats of the same node
     }
 }

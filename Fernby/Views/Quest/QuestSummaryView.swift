@@ -6,11 +6,14 @@ import SwiftUI
 struct QuestSummaryView: View {
     let correctCount: Int
     let totalCount: Int
-    let masteredNodeTitle: String?
-    /// Set only when this quest's mastery event completed a whole biome's
-    /// gate — a bigger, rarer moment than an ordinary node unlock, so it
-    /// gets its own badge instead of sharing the plain unlock line.
-    var justCompletedBiome: Biome? = nil
+    /// Usually 0 or 1 node, but a longer, multi-rep quest can master more
+    /// than one node in a single sitting — shown as a list, not silently
+    /// collapsed to just the last one.
+    var masteredNodeTitles: [String] = []
+    /// Set when this quest's mastery events completed one or more whole
+    /// biome gates — a bigger, rarer moment than an ordinary node unlock,
+    /// so it gets its own badge instead of sharing the plain unlock line.
+    var justCompletedBiomes: [Biome] = []
     let onDone: () -> Void
 
     var body: some View {
@@ -22,12 +25,16 @@ struct QuestSummaryView: View {
             Text("Quest complete!")
                 .font(.system(size: 30, weight: .heavy, design: .rounded))
 
-            if let biome = justCompletedBiome {
-                biomeCompleteBadge(biome)
-            } else if let masteredNodeTitle {
-                Text("You unlocked \(masteredNodeTitle)!")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.secondary)
+            VStack(spacing: 12) {
+                ForEach(justCompletedBiomes, id: \.id) { biome in
+                    biomeCompleteBadge(biome)
+                }
+                if !unbadgedMasteredTitles.isEmpty {
+                    Text("You unlocked \(unbadgedMasteredTitles.formattedList())!")
+                        .font(.system(size: 18, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                }
             }
 
             Spacer()
@@ -38,14 +45,22 @@ struct QuestSummaryView: View {
         .padding()
         .onAppear {
             var message = "Great job! You finished your quest."
-            if let biome = justCompletedBiome {
+            for biome in justCompletedBiomes {
                 message += " You finished \(biome.title)!"
-            } else if let masteredNodeTitle {
-                message += " You unlocked \(masteredNodeTitle)!"
+            }
+            if !unbadgedMasteredTitles.isEmpty {
+                message += " You unlocked \(unbadgedMasteredTitles.formattedList())!"
             }
             Voice.shared.speak(message, interrupt: true)
             Haptics.shared.questComplete()
         }
+    }
+
+    /// Node titles not already called out by a biome badge above, so a
+    /// finished node doesn't get announced twice.
+    private var unbadgedMasteredTitles: [String] {
+        let biomeTitles = Set(justCompletedBiomes.map(\.title))
+        return masteredNodeTitles.filter { !biomeTitles.contains($0) }
     }
 
     private func biomeCompleteBadge(_ biome: Biome) -> some View {

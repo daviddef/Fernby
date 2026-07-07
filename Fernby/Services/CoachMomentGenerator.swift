@@ -21,7 +21,7 @@ struct CoachPrompt {
 enum CoachMomentGenerator {
     static func supports(_ kind: ActivityKind) -> Bool {
         switch kind {
-        case .sentenceBuild, .wordProblemStep: return false
+        case .sentenceBuild, .wordProblemStep, .letterTracing: return false
         default: return true
         }
     }
@@ -79,7 +79,7 @@ enum CoachMomentGenerator {
                 wrong: decoy
             )
 
-        case .sentenceBuild, .wordProblemStep:
+        case .sentenceBuild, .wordProblemStep, .letterTracing:
             return nil
         }
     }

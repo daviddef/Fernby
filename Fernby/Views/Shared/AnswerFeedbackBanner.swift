@@ -24,7 +24,7 @@ private struct AnswerFeedbackBanner: View {
         .foregroundStyle(.white)
         .padding(.horizontal, 22)
         .padding(.vertical, 12)
-        .background(Capsule().fill(kind == .correct ? Color.green : Color.orange))
+        .background(Capsule().fill(kind == .correct ? Color.fernbyCorrect : Color.fernbyWrong))
         .shadow(color: .black.opacity(0.18), radius: 8, y: 4)
         .accessibilityElement(children: .combine)
     }

@@ -15,16 +15,19 @@ struct AdditionTapView: View {
     @State private var justAnsweredCorrectly = false
     @State private var wrongChoice: Int?
     @State private var feedback: AnswerFeedbackKind?
+    @State private var objectEmoji = FunObjectBank.random()
 
     var body: some View {
         VStack(spacing: 28) {
             if max(fact.a, fact.b) <= 10 {
                 // Concrete counters at low difficulty; fades out at higher
-                // levels once the symbolic equation alone is the point.
+                // levels once the symbolic equation alone is the point. Same
+                // object on both sides — they're being combined into one
+                // total, not two different things.
                 HStack(spacing: 24) {
-                    DotGroup(count: fact.a, color: .blue)
+                    DotGroup(count: fact.a, emoji: objectEmoji)
                     Text("+").font(.system(size: 28, weight: .bold, design: .rounded))
-                    DotGroup(count: fact.b, color: .orange)
+                    DotGroup(count: fact.b, emoji: objectEmoji)
                 }
             }
 
@@ -40,13 +43,14 @@ struct AdditionTapView: View {
             }
         }
         .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .answerFeedback(feedback)
         .onAppear { setUpQuestion() }
     }
 
     private func tint(for choice: Int) -> Color {
-        if justAnsweredCorrectly, choice == fact.answer { return .green }
-        if wrongChoice == choice { return .orange.opacity(0.7) }
+        if justAnsweredCorrectly, choice == fact.answer { return .fernbyCorrect }
+        if wrongChoice == choice { return .fernbyWrong }
         return .accentColor
     }
 
@@ -58,6 +62,7 @@ struct AdditionTapView: View {
         justAnsweredCorrectly = false
         wrongChoice = nil
         feedback = nil
+        objectEmoji = FunObjectBank.random()
         Voice.shared.speak("\(fact.spokenText)?", interrupt: true)
     }
 

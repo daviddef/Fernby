@@ -45,6 +45,7 @@ struct DailyQuestView: View {
     @State private var hasLoggedSession = false
     @State private var coachMomentNode: SkillNode?
     @State private var hasShownCoachMoment = false
+    @State private var hasShownBonusRound = false
 
     var body: some View {
         Group {
@@ -70,6 +71,8 @@ struct DailyQuestView: View {
                 )
             } else if let coachNode = coachMomentNode, !hasShownCoachMoment {
                 CoachMomentView(node: coachNode, onDone: { hasShownCoachMoment = true })
+            } else if !hasShownBonusRound {
+                MatchingGameView(onDone: { hasShownBonusRound = true })
             } else {
                 QuestSummaryView(
                     correctCount: viewModel.sessionCorrectCount,

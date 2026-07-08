@@ -16,6 +16,7 @@ struct WorldMapView: View {
     @State private var showingParentGate = false
     @State private var showingSettings = false
     @State private var showingJournal = false
+    @State private var returnGreeting: String?
 
     private var unlockedBiomesInOrder: [Biome] {
         Biome.all.filter { $0.isUnlocked(progressStore) }
@@ -27,6 +28,13 @@ struct WorldMapView: View {
                 Text("Fernby")
                     .font(.system(size: 32, weight: .heavy, design: .rounded))
                     .padding(.top, 24)
+
+                if let returnGreeting {
+                    Text(returnGreeting)
+                        .font(.system(size: 17, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .transition(.opacity)
+                }
 
                 Button {
                     Haptics.shared.tap()
@@ -78,6 +86,16 @@ struct WorldMapView: View {
         .sheet(isPresented: $showingJournal) {
             CompanionJournalView(progressStore: progressStore)
         }
+        .onAppear { showReturnGreetingIfNeeded() }
+    }
+
+    private func showReturnGreetingIfNeeded() {
+        guard returnGreeting == nil, let greeting = GreetingBank.forReturningVisit(
+            daysPlayed: progressStore.companion.daysPlayed,
+            totalActivitiesCompleted: progressStore.companion.totalActivitiesCompleted
+        ) else { return }
+        withAnimation { returnGreeting = greeting }
+        Voice.shared.speak(greeting, interrupt: false)
     }
 
     private var trail: some View {

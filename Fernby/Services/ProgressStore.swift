@@ -114,7 +114,7 @@ final class ProgressStore: ObservableObject {
         return try? JSONDecoder().decode(T.self, from: data)
     }
 
-    private static func todayKey() -> String {
+    static func todayKey() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         return formatter.string(from: Date())

@@ -1,12 +1,15 @@
 import SwiftUI
+import UIKit
 
 /// The first "writing" activity in the app — and deliberately not a
-/// handwriting grader. Precise stroke-order or shape-matching would punish
-/// exactly the fine-motor imprecision this age group is still developing;
-/// instead this checks for a genuine, letter-sized attempt (did the child's
-/// finger cover a real portion of the guide letter's footprint) and
+/// handwriting grader. Precise stroke-*order* matching would punish exactly
+/// the fine-motor imprecision this age group is still developing; instead
+/// this checks that the finger actually followed the letter's shape (not
+/// just moved around inside its bounding box — an early version scored
+/// pure bounding-box coverage and passed a scribble that didn't resemble
+/// the letter at all, caught from a real TestFlight screenshot) and
 /// celebrates that, the same "effort over precision" posture as every
-/// other activity's gentle-retry contract — just adapted for a gesture
+/// other activity's gentle-retry contract, just adapted for a gesture
 /// instead of a tap. An insufficient attempt never clears the child's
 /// work; it just asks them to keep tracing.
 struct LetterTracingView: View {
@@ -14,15 +17,25 @@ struct LetterTracingView: View {
     let onAdvance: () -> Void
 
     private static let canvasSize: CGFloat = 260
-    /// A trace must span at least this fraction of the canvas in both
-    /// dimensions to count — generous enough that any real attempt at the
-    /// letter's actual size passes, strict enough that a single tap or a
-    /// tiny scribble in one corner doesn't.
-    private static let minCoverageFraction: CGFloat = 0.35
+    /// Cell size for the coverage grid — coarse enough to be forgiving of
+    /// wobble (a stroke drawn 16pt wide already has slop built in), fine
+    /// enough to actually distinguish "traced the curve" from "scribbled
+    /// somewhere nearby."
+    private static let gridStep = 14
+    /// Fraction of the letter's own "ink" cells that must be visited by the
+    /// trace to count. Generous on purpose — this is coverage of the real
+    /// shape, not a stroke-order or precision grade.
+    private static let minInkCoverage = 0.5
+
+    private struct GridCell: Hashable {
+        let row: Int
+        let col: Int
+    }
 
     @State private var target = PhonicsBank.random(avoiding: RecentItemTracker.shared.recent(for: "letterTracing"))
     @State private var completedStrokes: [[CGPoint]] = []
     @State private var currentStroke: [CGPoint] = []
+    @State private var inkCells: Set<GridCell> = []
     @State private var hasRespondedFirstTime = false
     @State private var isDone = false
     @State private var feedback: AnswerFeedbackKind?
@@ -94,6 +107,7 @@ struct LetterTracingView: View {
         RecentItemTracker.shared.record(target.letter, for: "letterTracing")
         completedStrokes = []
         currentStroke = []
+        inkCells = Self.computeInkCells(for: target.letter)
         hasRespondedFirstTime = false
         isDone = false
         feedback = nil
@@ -108,13 +122,7 @@ struct LetterTracingView: View {
     }
 
     private func checkTrace() {
-        let allPoints = completedStrokes.flatMap { $0 }
-        guard let minX = allPoints.map(\.x).min(), let maxX = allPoints.map(\.x).max(),
-              let minY = allPoints.map(\.y).min(), let maxY = allPoints.map(\.y).max() else { return }
-
-        let coversWidth = (maxX - minX) >= Self.canvasSize * Self.minCoverageFraction
-        let coversHeight = (maxY - minY) >= Self.canvasSize * Self.minCoverageFraction
-        let goodAttempt = coversWidth && coversHeight
+        let goodAttempt = coverageFraction() >= Self.minInkCoverage
 
         if !hasRespondedFirstTime {
             hasRespondedFirstTime = true
@@ -132,11 +140,80 @@ struct LetterTracingView: View {
         } else {
             feedback = .tryAgain
             Haptics.shared.tryAgain()
-            encouragement = "Keep going — trace all the way over the letter!"
-            Voice.shared.speak("Keep tracing, all the way over the letter.")
+            encouragement = "Keep going — trace along the letter's shape!"
+            Voice.shared.speak("Keep tracing, right along the letter.")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 feedback = nil
             }
         }
+    }
+
+    /// Fraction of the guide letter's own ink cells that the drawn stroke
+    /// actually passed through — real shape coverage, not just "moved
+    /// around somewhere in the box."
+    private func coverageFraction() -> Double {
+        guard !inkCells.isEmpty else { return 0 }
+        var hitCells: Set<GridCell> = []
+        for point in completedStrokes.flatMap({ $0 }) {
+            let cell = GridCell(row: Int(point.y) / Self.gridStep, col: Int(point.x) / Self.gridStep)
+            if inkCells.contains(cell) { hitCells.insert(cell) }
+        }
+        return Double(hitCells.count) / Double(inkCells.count)
+    }
+
+    /// Rasterizes the guide letter — same font/size/weight as the on-screen
+    /// Text — into a coarse grid of "ink present" cells. Done once per
+    /// question rather than per pixel-perfect comparison, so this stays
+    /// fast and just as generous as intended: a whole cell (14pt) counts as
+    /// covered the moment any part of the stroke passes through it.
+    private static func computeInkCells(for letter: String) -> Set<GridCell> {
+        let size = Int(canvasSize)
+        guard let colorSpace = CGColorSpace(name: CGColorSpace.genericGrayGamma2_2),
+              let context = CGContext(
+                data: nil, width: size, height: size,
+                bitsPerComponent: 8, bytesPerRow: 0,
+                space: colorSpace, bitmapInfo: CGImageAlphaInfo.none.rawValue
+              ) else { return [] }
+
+        context.setFillColor(gray: 1, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: size, height: size))
+
+        UIGraphicsPushContext(context)
+        let descriptor = UIFont.systemFont(ofSize: 220, weight: .heavy).fontDescriptor.withDesign(.rounded)
+        let font = descriptor.map { UIFont(descriptor: $0, size: 220) } ?? UIFont.systemFont(ofSize: 220, weight: .heavy)
+        let string = letter.uppercased() as NSString
+        let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: UIColor.black]
+        let stringSize = string.size(withAttributes: attributes)
+        let origin = CGPoint(x: (CGFloat(size) - stringSize.width) / 2, y: (CGFloat(size) - stringSize.height) / 2)
+        string.draw(at: origin, withAttributes: attributes)
+        UIGraphicsPopContext()
+
+        guard let data = context.data else { return [] }
+        // Don't assume bytesPerRow == width — passing bytesPerRow: 0 lets
+        // CG choose its own (possibly padded) row stride.
+        let bytesPerRow = context.bytesPerRow
+        let buffer = data.bindMemory(to: UInt8.self, capacity: bytesPerRow * size)
+
+        var cells: Set<GridCell> = []
+        let columns = size / gridStep
+        for row in 0..<columns {
+            for col in 0..<columns {
+                var hasInk = false
+                rowScan: for dy in 0..<gridStep {
+                    let y = row * gridStep + dy
+                    guard y < size else { break }
+                    for dx in 0..<gridStep {
+                        let x = col * gridStep + dx
+                        guard x < size else { continue }
+                        if buffer[y * bytesPerRow + x] < 200 {
+                            hasInk = true
+                            break rowScan
+                        }
+                    }
+                }
+                if hasInk { cells.insert(GridCell(row: row, col: col)) }
+            }
+        }
+        return cells
     }
 }

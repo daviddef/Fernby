@@ -5,7 +5,10 @@ import Foundation
 /// which is exactly why sight words are taught as whole-word recognition
 /// rather than through PhonicsBank's decode-by-sound path.
 enum SightWordBank {
-    static let all: [String] = ["the", "and", "a", "I", "to", "is", "it", "you", "see", "can"]
+    static let all: [String] = [
+        "the", "and", "a", "I", "to", "is", "it", "you", "see", "can",
+        "go", "up", "in", "my", "look", "play", "run", "here", "little", "help",
+    ]
 
     static func random(avoiding recent: Set<String> = []) -> String {
         let pool = all.filter { !recent.contains($0) }

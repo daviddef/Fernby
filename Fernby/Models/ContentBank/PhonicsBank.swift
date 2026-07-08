@@ -25,7 +25,22 @@ enum PhonicsBank {
         LetterSoundEntry(letter: "n", sound: "n", exampleWord: "Net", emoji: "🥅"),
     ]
 
-    static var all: [LetterSoundEntry] { tier1 }
+    /// Continues the same synthetic-phonics sequence tier1 started —
+    /// s,a,t,p,i,n,m,d,g,o,c,k is the standard Phase 2 set, chosen because
+    /// these twelve letters alone can already spell dozens of real CVC
+    /// words (see WordBuildingBank). "c" is deliberately taught with the
+    /// same sound as "k" — that's the real early-phonics point (two
+    /// spellings, one sound), not a data-entry mistake.
+    static let tier2: [LetterSoundEntry] = [
+        LetterSoundEntry(letter: "m", sound: "mmm", exampleWord: "Moon", emoji: "🌙"),
+        LetterSoundEntry(letter: "d", sound: "d", exampleWord: "Duck", emoji: "🦆"),
+        LetterSoundEntry(letter: "g", sound: "g", exampleWord: "Goat", emoji: "🐐"),
+        LetterSoundEntry(letter: "o", sound: "o", exampleWord: "Octopus", emoji: "🐙"),
+        LetterSoundEntry(letter: "c", sound: "k", exampleWord: "Cat", emoji: "🐱"),
+        LetterSoundEntry(letter: "k", sound: "k", exampleWord: "Kite", emoji: "🪁"),
+    ]
+
+    static var all: [LetterSoundEntry] { tier1 + tier2 }
 
     static func entry(for letter: String) -> LetterSoundEntry? {
         all.first { $0.letter == letter }

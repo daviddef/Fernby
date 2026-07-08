@@ -9,10 +9,11 @@ struct BuildableWord: Codable, Equatable {
     let letters: [String]
 }
 
-/// Every word here is spelled entirely from PhonicsBank.tier1 letters
-/// (s, a, t, p, i, n) — a blending word bank can only ever be as large as
-/// the phonics bank backing it, so this grows in lockstep as more letters
-/// are added there.
+/// Every word here is spelled entirely from PhonicsBank letters — a
+/// blending word bank can only ever be as large as the phonics bank
+/// backing it, so this grows in lockstep as more letters are added there.
+/// The tier1 set (s,a,t,p,i,n) originally supported 7 words; tier2
+/// (m,d,g,o,c,k) unlocks these 10 more real CVC words.
 enum WordBuildingBank {
     static let all: [BuildableWord] = [
         BuildableWord(word: "pan", emoji: "🍳", letters: ["p", "a", "n"]),
@@ -22,6 +23,16 @@ enum WordBuildingBank {
         BuildableWord(word: "sip", emoji: "🥤", letters: ["s", "i", "p"]),
         BuildableWord(word: "ant", emoji: "🐜", letters: ["a", "n", "t"]),
         BuildableWord(word: "tap", emoji: "🚰", letters: ["t", "a", "p"]),
+        BuildableWord(word: "cat", emoji: "🐱", letters: ["c", "a", "t"]),
+        BuildableWord(word: "dog", emoji: "🐶", letters: ["d", "o", "g"]),
+        BuildableWord(word: "pig", emoji: "🐷", letters: ["p", "i", "g"]),
+        BuildableWord(word: "mad", emoji: "😠", letters: ["m", "a", "d"]),
+        BuildableWord(word: "sad", emoji: "😢", letters: ["s", "a", "d"]),
+        BuildableWord(word: "dad", emoji: "👨", letters: ["d", "a", "d"]),
+        BuildableWord(word: "map", emoji: "🗺️", letters: ["m", "a", "p"]),
+        BuildableWord(word: "dig", emoji: "⛏️", letters: ["d", "i", "g"]),
+        BuildableWord(word: "cap", emoji: "🧢", letters: ["c", "a", "p"]),
+        BuildableWord(word: "man", emoji: "🧑", letters: ["m", "a", "n"]),
     ]
 
     static func random(avoiding recent: Set<String> = []) -> BuildableWord {

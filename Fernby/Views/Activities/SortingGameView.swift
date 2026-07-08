@@ -91,7 +91,7 @@ struct SortingGameView: View {
         if correct {
             feedback = .correct
             Haptics.shared.correct()
-            Voice.shared.speak("Yes!")
+            Voice.shared.speak(PraiseBank.random())
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                 feedback = nil
                 index += 1

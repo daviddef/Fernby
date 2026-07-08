@@ -106,7 +106,7 @@ struct WordBuildingView: View {
             justAnsweredCorrectly = true
             feedback = .correct
             Haptics.shared.correct()
-            Voice.shared.speak("Yes! \(target.word)!")
+            Voice.shared.speak("\(PraiseBank.random()) \(target.word)!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
                 onAdvance()
             }

@@ -64,7 +64,7 @@ struct NumberIDTapView: View {
             justAnsweredCorrectly = true
             feedback = .correct
             Haptics.shared.correct()
-            Voice.shared.speak("Yes! That's \(target).")
+            Voice.shared.speak("\(PraiseBank.random()) That's \(target).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
                 onAdvance()
             }

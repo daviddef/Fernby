@@ -16,13 +16,18 @@ struct QuestSummaryView: View {
     var justCompletedBiomes: [Biome] = []
     let onDone: () -> Void
 
+    /// Varied so a child doesn't hear the identical line every single
+    /// quest — this is the most-seen screen in the app.
+    private static let headlines = ["Quest complete!", "You did it!", "Great quest!", "Nice work today!"]
+    @State private var headline = QuestSummaryView.headlines.randomElement()!
+
     var body: some View {
         VStack(spacing: 24) {
             Spacer()
 
             CompanionView(progressStore: ProgressStore.shared, size: 180, showsName: true)
 
-            Text("Quest complete!")
+            Text(headline)
                 .font(.system(size: 30, weight: .heavy, design: .rounded))
 
             VStack(spacing: 12) {
@@ -44,7 +49,7 @@ struct QuestSummaryView: View {
         }
         .padding()
         .onAppear {
-            var message = "Great job! You finished your quest."
+            var message = "\(headline) You finished your quest."
             for biome in justCompletedBiomes {
                 message += " You finished \(biome.title)!"
             }

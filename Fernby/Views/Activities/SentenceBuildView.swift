@@ -133,7 +133,7 @@ struct SentenceBuildView: View {
             justAnsweredCorrectly = true
             feedback = .correct
             Haptics.shared.correct()
-            Voice.shared.speak("Yes! \(sentence.spoken)")
+            Voice.shared.speak("\(PraiseBank.random()) \(sentence.spoken)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
                 onAdvance()
             }

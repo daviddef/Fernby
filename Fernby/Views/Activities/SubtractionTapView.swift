@@ -70,7 +70,7 @@ struct SubtractionTapView: View {
             justAnsweredCorrectly = true
             feedback = .correct
             Haptics.shared.correct()
-            Voice.shared.speak("That's right! \(fact.spokenText) is \(fact.answer).")
+            Voice.shared.speak("\(PraiseBank.random()) \(fact.spokenText) is \(fact.answer).")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
                 onAdvance()
             }

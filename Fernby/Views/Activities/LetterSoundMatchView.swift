@@ -76,7 +76,7 @@ struct LetterSoundMatchView: View {
             justAnsweredCorrectly = true
             feedback = .correct
             Haptics.shared.correct()
-            Voice.shared.speak("Yes! \(target.letter) says \(target.sound), like \(target.exampleWord)!")
+            Voice.shared.speak("\(PraiseBank.random()) \(target.letter) says \(target.sound), like \(target.exampleWord)!")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.1) {
                 onAdvance()
             }

@@ -26,6 +26,14 @@ struct LetterTracingView: View {
     /// trace to count. Generous on purpose — this is coverage of the real
     /// shape, not a stroke-order or precision grade.
     private static let minInkCoverage = 0.5
+    /// Fraction of the *drawn* cells that must actually be on the letter's
+    /// ink. Without this, coverage alone is gameable: a scribble that fills
+    /// most of the canvas trivially touches enough ink cells to pass,
+    /// because it touches almost everything (caught from a real TestFlight
+    /// screenshot — a solid colored-in blob was marked correct). This is
+    /// the same check in the other direction: most of what was drawn has
+    /// to land on the letter, not just some of the letter get touched.
+    private static let minPrecision = 0.5
 
     private struct GridCell: Hashable {
         let row: Int
@@ -122,7 +130,8 @@ struct LetterTracingView: View {
     }
 
     private func checkTrace() {
-        let goodAttempt = coverageFraction() >= Self.minInkCoverage
+        let (recall, precision) = coverageFractions()
+        let goodAttempt = recall >= Self.minInkCoverage && precision >= Self.minPrecision
 
         if !hasRespondedFirstTime {
             hasRespondedFirstTime = true
@@ -148,17 +157,24 @@ struct LetterTracingView: View {
         }
     }
 
-    /// Fraction of the guide letter's own ink cells that the drawn stroke
-    /// actually passed through — real shape coverage, not just "moved
-    /// around somewhere in the box."
-    private func coverageFraction() -> Double {
-        guard !inkCells.isEmpty else { return 0 }
-        var hitCells: Set<GridCell> = []
+    /// Two independent fractions, both required: `recall` is how much of
+    /// the guide letter's own ink the drawn stroke actually passed through
+    /// (real shape coverage, not just "moved around somewhere in the
+    /// box"); `precision` is how much of what was actually drawn landed on
+    /// that ink, rather than scribbled broadly across the canvas. A wobbly
+    /// but real trace scores well on both; a scribble or solid fill scores
+    /// well on recall alone, which is exactly the gap precision closes.
+    private func coverageFractions() -> (recall: Double, precision: Double) {
+        guard !inkCells.isEmpty else { return (0, 0) }
+        var drawnCells: Set<GridCell> = []
         for point in completedStrokes.flatMap({ $0 }) {
-            let cell = GridCell(row: Int(point.y) / Self.gridStep, col: Int(point.x) / Self.gridStep)
-            if inkCells.contains(cell) { hitCells.insert(cell) }
+            drawnCells.insert(GridCell(row: Int(point.y) / Self.gridStep, col: Int(point.x) / Self.gridStep))
         }
-        return Double(hitCells.count) / Double(inkCells.count)
+        guard !drawnCells.isEmpty else { return (0, 0) }
+        let hitCells = drawnCells.intersection(inkCells)
+        let recall = Double(hitCells.count) / Double(inkCells.count)
+        let precision = Double(hitCells.count) / Double(drawnCells.count)
+        return (recall, precision)
     }
 
     /// Rasterizes the guide letter — same font/size/weight as the on-screen

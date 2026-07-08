@@ -39,6 +39,14 @@ final class DailyQuestViewModel: ObservableObject {
 struct DailyQuestView: View {
     let onComplete: () -> Void
 
+    /// Three bonus-round games with genuinely different mechanics (flip a
+    /// card, sort into a bucket, listen and point) rather than one game
+    /// shown every single quest — picked once per quest so the reward lap
+    /// at the end varies session to session.
+    private enum BonusGame: CaseIterable {
+        case matching, sorting, listenAndPoint
+    }
+
     @StateObject private var viewModel = DailyQuestViewModel()
     @State private var justMasteredNodeIDs: [String] = []
     @State private var justCompletedBiomes: [Biome] = []
@@ -46,6 +54,7 @@ struct DailyQuestView: View {
     @State private var coachMomentNode: SkillNode?
     @State private var hasShownCoachMoment = false
     @State private var hasShownBonusRound = false
+    @State private var bonusGame: BonusGame = BonusGame.allCases.randomElement()!
 
     var body: some View {
         Group {
@@ -72,7 +81,7 @@ struct DailyQuestView: View {
             } else if let coachNode = coachMomentNode, !hasShownCoachMoment {
                 CoachMomentView(node: coachNode, onDone: { hasShownCoachMoment = true })
             } else if !hasShownBonusRound {
-                MatchingGameView(onDone: { hasShownBonusRound = true })
+                bonusRoundView
             } else {
                 QuestSummaryView(
                     correctCount: viewModel.sessionCorrectCount,
@@ -87,6 +96,18 @@ struct DailyQuestView: View {
         .onAppear {
             Haptics.shared.prepareAll()
             coachMomentNode = ReviewScheduler.dueNode()
+        }
+    }
+
+    @ViewBuilder
+    private var bonusRoundView: some View {
+        switch bonusGame {
+        case .matching:
+            MatchingGameView(onDone: { hasShownBonusRound = true })
+        case .sorting:
+            SortingGameView(onDone: { hasShownBonusRound = true })
+        case .listenAndPoint:
+            ListenAndPointView(onDone: { hasShownBonusRound = true })
         }
     }
 

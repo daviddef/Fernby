@@ -11,6 +11,20 @@ struct FernbyApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                // Every color in this app — the accent peach, the
+                // correct/wrong green and rose-red, the low-opacity card
+                // tints in MatchingGameView — was chosen and verified only
+                // against a light background. Nothing here has ever been
+                // designed or tested for Dark Mode; a real bug report
+                // showed matched/unmatched cards collapsing toward
+                // near-black and reading as completely unresponsive when
+                // the system was in Dark Mode. Forcing light appearance
+                // keeps every already-verified screen exactly as tested,
+                // regardless of the device's system appearance, Night
+                // Shift, or Sleep Focus schedule. Revisit if Dark Mode
+                // support is ever deliberately designed, not patched in
+                // piecemeal per-view.
+                .preferredColorScheme(.light)
         }
     }
 }

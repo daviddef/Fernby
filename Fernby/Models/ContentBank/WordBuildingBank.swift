@@ -33,14 +33,24 @@ enum WordBuildingBank {
         BuildableWord(word: "dig", emoji: "⛏️", letters: ["d", "i", "g"]),
         BuildableWord(word: "cap", emoji: "🧢", letters: ["c", "a", "p"]),
         BuildableWord(word: "man", emoji: "🧑", letters: ["m", "a", "n"]),
+        // Unlocked by PhonicsBank.tier3 (e, u, r, h, b, f, l).
+        BuildableWord(word: "run", emoji: "🏃", letters: ["r", "u", "n"]),
+        BuildableWord(word: "hat", emoji: "🎩", letters: ["h", "a", "t"]),
+        BuildableWord(word: "bat", emoji: "🦇", letters: ["b", "a", "t"]),
+        BuildableWord(word: "big", emoji: "🐘", letters: ["b", "i", "g"]),
+        BuildableWord(word: "bug", emoji: "🐛", letters: ["b", "u", "g"]),
+        BuildableWord(word: "hen", emoji: "🐔", letters: ["h", "e", "n"]),
+        BuildableWord(word: "bed", emoji: "🛏️", letters: ["b", "e", "d"]),
+        BuildableWord(word: "leg", emoji: "🦵", letters: ["l", "e", "g"]),
+        BuildableWord(word: "log", emoji: "🪵", letters: ["l", "o", "g"]),
+        BuildableWord(word: "sun", emoji: "☀️", letters: ["s", "u", "n"]),
     ]
 
     static func random(avoiding recent: Set<String> = []) -> BuildableWord {
-        let pool = all.filter { !recent.contains($0.word) }
-        return (pool.isEmpty ? all : pool).randomElement()!
+        all.random(avoiding: recent)
     }
 
     static func decoys(excluding target: BuildableWord, count: Int) -> [BuildableWord] {
-        Array(all.filter { $0.word != target.word }.shuffled().prefix(count))
+        all.decoys(excluding: target, count: count)
     }
 }

@@ -36,11 +36,11 @@ struct ActivityContainerView: View {
             case .letterTracing:
                 LetterTracingView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .letterSoundMatch:
-                LetterSoundMatchView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+                LetterSoundMatchView(nodeID: node.id, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .wordBuilding:
                 WordBuildingView(nodeID: node.id, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .sightWordTap:
-                SightWordTapView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+                SightWordTapView(nodeID: node.id, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .sentenceBuild:
                 SentenceBuildView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .countingTap:
@@ -53,6 +53,14 @@ struct ActivityContainerView: View {
                 SubtractionTapView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .wordProblemStep:
                 WordProblemStepView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .shapesTap:
+                ShapesView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .skipCountingTap:
+                SkipCountingView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .placeValueTap:
+                PlaceValueView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .measurementTap:
+                MeasurementView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             }
         }
         .id(instanceID) // fresh identity per occurrence, even repeats of the same node

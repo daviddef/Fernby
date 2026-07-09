@@ -1,14 +1,24 @@
 import SwiftUI
 
-/// Isolates exactly one skill — matching a single letter to its sound — per
-/// the "one skill at a time" pedagogy constraint. The letter is always
-/// shown on screen, never audio-only. Wrong answers never end the activity;
-/// the same question just asks again.
+/// Isolates exactly one skill — matching a letter or digraph to its sound —
+/// per the "one skill at a time" pedagogy constraint. The grapheme is
+/// always shown on screen, never audio-only. Wrong answers never end the
+/// activity; the same question just asks again.
+///
+/// Shared by two nodes the same way WordBuildingView shares `blending` and
+/// `cvcWords`: `reading.letterSounds` uses PhonicsBank, `reading.
+/// digraphSounds` uses DigraphBank — same interaction, different bank.
 struct LetterSoundMatchView: View {
+    let nodeID: String
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var target = PhonicsBank.random(avoiding: RecentItemTracker.shared.recent(for: "letterSounds"))
+    private var isDigraphVariant: Bool { nodeID == "reading.digraphSounds" }
+    private var bank: [LetterSoundEntry] { isDigraphVariant ? DigraphBank.all : PhonicsBank.all }
+
+    // Can't reference `nodeID` in a property initializer — setUpQuestion(),
+    // called on appear, immediately overwrites this with the real pick.
+    @State private var target = PhonicsBank.random()
     @State private var choices: [LetterSoundEntry] = []
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
@@ -18,11 +28,11 @@ struct LetterSoundMatchView: View {
     var body: some View {
         VStack(spacing: 28) {
             Text(target.letter.uppercased())
-                .font(.system(size: 96, weight: .heavy, design: .rounded))
+                .font(.system(size: target.letter.count > 2 ? 64 : 96, weight: .heavy, design: .rounded))
                 .foregroundStyle(Color.accentColor)
-                .accessibilityLabel("The letter \(target.letter)")
+                .accessibilityLabel("The letters \(target.letter)")
 
-            Text("What sound does this letter make?")
+            Text("What sound does this make?")
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .multilineTextAlignment(.center)
 
@@ -54,14 +64,15 @@ struct LetterSoundMatchView: View {
     }
 
     private func setUpQuestion() {
-        RecentItemTracker.shared.record(target.letter, for: "letterSounds")
-        let decoys = PhonicsBank.decoys(excluding: target, count: 2)
+        target = bank.random(avoiding: RecentItemTracker.shared.recent(for: nodeID))
+        RecentItemTracker.shared.record(target.letter, for: nodeID)
+        let decoys = bank.decoys(excluding: target, count: 2)
         choices = ([target] + decoys).shuffled()
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false
         wrongLetter = nil
         feedback = nil
-        Voice.shared.speak("What sound does this letter make?", interrupt: true)
+        Voice.shared.speak("What sound does this make?", interrupt: true)
         Voice.shared.speak(target.sound, interrupt: false)
     }
 

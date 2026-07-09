@@ -35,17 +35,37 @@ struct Biome: Identifiable {
         Biome(
             id: "pebbleCreek", title: "Pebble Creek", emoji: "🐚",
             accentColor: Color(red: 0.33, green: 0.66, blue: 0.71),
-            gateNodeIDs: ["reading.blending", "math.numberID"]
+            gateNodeIDs: ["reading.digraphSounds", "math.numberID"]
         ),
         Biome(
             id: "fireflyGrove", title: "Firefly Grove", emoji: "✨",
             accentColor: Color(red: 0.54, green: 0.46, blue: 0.74),
-            gateNodeIDs: ["reading.sightWords", "math.addition"]
+            gateNodeIDs: ["reading.blending", "math.shapes"]
+        ),
+        Biome(
+            id: "starHollow", title: "Star Hollow", emoji: "⭐️",
+            accentColor: Color(red: 0.82, green: 0.5, blue: 0.18),
+            gateNodeIDs: ["reading.blendWords", "math.addition"]
+        ),
+        Biome(
+            id: "moonlitMarsh", title: "Moonlit Marsh", emoji: "🌙",
+            accentColor: Color(red: 0.28, green: 0.32, blue: 0.58),
+            gateNodeIDs: ["reading.sightWords", "math.skipCounting"]
         ),
         Biome(
             id: "rainbowFalls", title: "Rainbow Falls", emoji: "🌈",
             accentColor: Color(red: 0.93, green: 0.44, blue: 0.55),
-            gateNodeIDs: ["reading.cvcWords", "math.subtraction"]
+            gateNodeIDs: ["reading.sightWordsAdvanced", "math.subtraction"]
+        ),
+        Biome(
+            id: "coralCove", title: "Coral Cove", emoji: "🪸",
+            accentColor: Color(red: 0.86, green: 0.45, blue: 0.38),
+            gateNodeIDs: ["reading.cvcWords", "math.placeValue"]
+        ),
+        Biome(
+            id: "sandyDune", title: "Sandy Dune", emoji: "🏜️",
+            accentColor: Color(red: 0.78, green: 0.65, blue: 0.42),
+            gateNodeIDs: ["reading.digraphWords", "math.measurement"]
         ),
     ]
 

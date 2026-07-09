@@ -10,6 +10,10 @@ struct FernbyApp: App {
 
     var body: some Scene {
         WindowGroup {
+            #if DEBUG
+            debugRoot
+                .preferredColorScheme(.light)
+            #else
             RootView()
                 // Every color in this app — the accent peach, the
                 // correct/wrong green and rose-red, the low-opacity card
@@ -25,8 +29,25 @@ struct FernbyApp: App {
                 // support is ever deliberately designed, not patched in
                 // piecemeal per-view.
                 .preferredColorScheme(.light)
+            #endif
         }
     }
+
+    #if DEBUG
+    /// Manual-QA hook: launch with env var WT_DEBUG_NODE set to any skill
+    /// node id (e.g. "math.shapes") to jump straight into that node's
+    /// activity view, bypassing the world map, placement, and quest flow
+    /// entirely. Used to screenshot-verify each new node's activity view
+    /// in isolation without playing through the whole chain to reach it.
+    @ViewBuilder
+    private var debugRoot: some View {
+        if let nodeID = ProcessInfo.processInfo.environment["WT_DEBUG_NODE"], let node = SkillGraph.node(id: nodeID) {
+            ActivityContainerView(node: node, instanceID: 0, onFirstResponse: { _ in }, onAdvance: {})
+        } else {
+            RootView()
+        }
+    }
+    #endif
 }
 
 #if DEBUG

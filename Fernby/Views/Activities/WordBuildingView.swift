@@ -1,17 +1,27 @@
 import SwiftUI
 
-/// Shared by two nodes in the reading chain that both work over
-/// WordBuildingBank but ask for a different skill: `reading.blending` (are
-/// you can turn sounded-out letters into a word) comes first, then
-/// `reading.cvcWords` (can you read the whole word fluently, no sound
-/// scaffold) later in the same chain. `nodeID` picks the variant; nothing
+/// Shared by four nodes across two skills and two content tiers:
+/// `reading.blending`/`reading.blendWords` ask "can you turn sounded-out
+/// letters into a word," `reading.cvcWords`/`reading.digraphWords` ask
+/// "can you read the whole word fluently, no sound scaffold." `nodeID`
+/// picks both the interaction variant and which bank backs it; nothing
 /// else about the activity differs.
 struct WordBuildingView: View {
     let nodeID: String
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    private var isBlendingVariant: Bool { nodeID == "reading.blending" }
+    private var isBlendingVariant: Bool {
+        nodeID == "reading.blending" || nodeID == "reading.blendWords"
+    }
+
+    private var bank: [BuildableWord] {
+        switch nodeID {
+        case "reading.blendWords": return BlendWordBank.all
+        case "reading.digraphWords": return DigraphWordBank.all
+        default: return WordBuildingBank.all
+        }
+    }
 
     // Can't reference `nodeID` (an instance member) in a property
     // initializer — setUpQuestion(), called on appear, immediately
@@ -75,9 +85,9 @@ struct WordBuildingView: View {
     }
 
     private func setUpQuestion() {
-        target = WordBuildingBank.random(avoiding: RecentItemTracker.shared.recent(for: nodeID))
+        target = bank.random(avoiding: RecentItemTracker.shared.recent(for: nodeID))
         RecentItemTracker.shared.record(target.word, for: nodeID)
-        let decoys = WordBuildingBank.decoys(excluding: target, count: 2)
+        let decoys = bank.decoys(excluding: target, count: 2)
         choices = ([target] + decoys).shuffled()
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false

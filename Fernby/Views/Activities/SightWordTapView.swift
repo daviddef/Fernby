@@ -8,11 +8,21 @@ import SwiftUI
 /// the word's length gives a real non-verbal signal (how long is it?)
 /// without doing that — Voice can be muted and the activity still gives
 /// the child something concrete to check their guess against.
+///
+/// Shared by two nodes: `reading.sightWords` (Dolch pre-primer, via
+/// SightWordBank) and `reading.sightWordsAdvanced` (Dolch primer, via
+/// SightWordAdvancedBank) — same interaction, different tier.
 struct SightWordTapView: View {
+    let nodeID: String
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    @State private var target = SightWordBank.random(avoiding: RecentItemTracker.shared.recent(for: "sightWords"))
+    private var isAdvancedVariant: Bool { nodeID == "reading.sightWordsAdvanced" }
+    private var bank: [String] { isAdvancedVariant ? SightWordAdvancedBank.all : SightWordBank.all }
+
+    // Can't reference `nodeID` in a property initializer — setUpQuestion(),
+    // called on appear, immediately overwrites this with the real pick.
+    @State private var target = SightWordBank.random()
     @State private var choices: [String] = []
     @State private var hasRespondedFirstTime = false
     @State private var justAnsweredCorrectly = false
@@ -61,9 +71,9 @@ struct SightWordTapView: View {
     }
 
     private func setUpQuestion() {
-        target = SightWordBank.random(avoiding: RecentItemTracker.shared.recent(for: "sightWords"))
-        RecentItemTracker.shared.record(target, for: "sightWords")
-        let decoys = SightWordBank.decoys(excluding: target, count: 2)
+        target = bank.randomWord(avoiding: RecentItemTracker.shared.recent(for: nodeID))
+        RecentItemTracker.shared.record(target, for: nodeID)
+        let decoys = bank.decoyWords(excluding: target, count: 2)
         choices = ([target] + decoys).shuffled()
         hasRespondedFirstTime = false
         justAnsweredCorrectly = false

@@ -40,7 +40,23 @@ enum PhonicsBank {
         LetterSoundEntry(letter: "k", sound: "k", exampleWord: "Kite", emoji: "🪁"),
     ]
 
-    static var all: [LetterSoundEntry] { tier1 + tier2 }
+    /// Completes the real Phase 2 set (tier1+tier2+tier3 = 19 letters,
+    /// matching the standard synthetic-phonics scope) rather than stopping
+    /// at 12 — these seven letters are what turn WordBuildingBank from "a
+    /// dozen 3-letter words" into genuine blend-word territory (run, hat,
+    /// bed, help, frog, milk...), since blends need more raw letters than
+    /// s/a/t/p/i/n/m/d/g/o/c/k alone can spell.
+    static let tier3: [LetterSoundEntry] = [
+        LetterSoundEntry(letter: "e", sound: "eh", exampleWord: "Egg", emoji: "🥚"),
+        LetterSoundEntry(letter: "u", sound: "uh", exampleWord: "Umbrella", emoji: "☂️"),
+        LetterSoundEntry(letter: "r", sound: "rrr", exampleWord: "Rabbit", emoji: "🐰"),
+        LetterSoundEntry(letter: "h", sound: "h", exampleWord: "Hat", emoji: "🎩"),
+        LetterSoundEntry(letter: "b", sound: "b", exampleWord: "Ball", emoji: "⚽️"),
+        LetterSoundEntry(letter: "f", sound: "f", exampleWord: "Fish", emoji: "🐟"),
+        LetterSoundEntry(letter: "l", sound: "l", exampleWord: "Leaf", emoji: "🍃"),
+    ]
+
+    static var all: [LetterSoundEntry] { tier1 + tier2 + tier3 }
 
     static func entry(for letter: String) -> LetterSoundEntry? {
         all.first { $0.letter == letter }
@@ -48,12 +64,11 @@ enum PhonicsBank {
 
     /// A random entry to probe/practice, optionally avoiding recently seen ones.
     static func random(avoiding recent: Set<String> = []) -> LetterSoundEntry {
-        let pool = all.filter { !recent.contains($0.letter) }
-        return (pool.isEmpty ? all : pool).randomElement()!
+        all.random(avoiding: recent)
     }
 
     /// `count` decoy entries distinct from the target — the wrong-answer tiles.
     static func decoys(excluding target: LetterSoundEntry, count: Int) -> [LetterSoundEntry] {
-        Array(all.filter { $0.letter != target.letter }.shuffled().prefix(count))
+        all.decoys(excluding: target, count: count)
     }
 }

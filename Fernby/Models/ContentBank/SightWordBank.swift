@@ -11,11 +11,10 @@ enum SightWordBank {
     ]
 
     static func random(avoiding recent: Set<String> = []) -> String {
-        let pool = all.filter { !recent.contains($0) }
-        return (pool.isEmpty ? all : pool).randomElement()!
+        all.randomWord(avoiding: recent)
     }
 
     static func decoys(excluding target: String, count: Int) -> [String] {
-        Array(all.filter { $0 != target }.shuffled().prefix(count))
+        all.decoyWords(excluding: target, count: count)
     }
 }

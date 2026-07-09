@@ -21,7 +21,7 @@ struct CoachPrompt {
 enum CoachMomentGenerator {
     static func supports(_ kind: ActivityKind) -> Bool {
         switch kind {
-        case .sentenceBuild, .wordProblemStep, .letterTracing: return false
+        case .sentenceBuild, .wordProblemStep, .letterTracing, .measurementTap: return false
         default: return true
         }
     }
@@ -29,11 +29,12 @@ enum CoachMomentGenerator {
     static func prompt(for node: SkillNode, difficultyLevel: Int) -> CoachPrompt? {
         switch node.activityKind {
         case .letterSoundMatch:
-            let target = PhonicsBank.random()
-            let decoy = PhonicsBank.decoys(excluding: target, count: 1)[0]
+            let bank: [LetterSoundEntry] = node.id == "reading.digraphSounds" ? DigraphBank.all : PhonicsBank.all
+            let target = bank.random()
+            let decoy = bank.decoys(excluding: target, count: 1)[0]
             return build(
                 promptText: "What sound does \"\(target.letter.uppercased())\" make?",
-                spokenPrompt: "What sound does the letter \(target.letter) make?",
+                spokenPrompt: "What sound does \(target.letter) make?",
                 correct: target.sound,
                 wrong: decoy.sound
             )
@@ -60,8 +61,14 @@ enum CoachMomentGenerator {
             )
 
         case .wordBuilding:
-            let target = WordBuildingBank.random()
-            let decoy = WordBuildingBank.decoys(excluding: target, count: 1)[0]
+            let bank: [BuildableWord]
+            switch node.id {
+            case "reading.blendWords": bank = BlendWordBank.all
+            case "reading.digraphWords": bank = DigraphWordBank.all
+            default: bank = WordBuildingBank.all
+            }
+            let target = bank.random()
+            let decoy = bank.decoys(excluding: target, count: 1)[0]
             return build(
                 promptText: "\(target.emoji)",
                 spokenPrompt: "What word matches this picture?",
@@ -70,8 +77,9 @@ enum CoachMomentGenerator {
             )
 
         case .sightWordTap:
-            let target = SightWordBank.random()
-            let decoy = SightWordBank.decoys(excluding: target, count: 1)[0]
+            let bank: [String] = node.id == "reading.sightWordsAdvanced" ? SightWordAdvancedBank.all : SightWordBank.all
+            let target = bank.randomWord()
+            let decoy = bank.decoyWords(excluding: target, count: 1)[0]
             return build(
                 promptText: "\"\(target)\"",
                 spokenPrompt: "Is this word \(target)?",
@@ -79,7 +87,37 @@ enum CoachMomentGenerator {
                 wrong: decoy
             )
 
-        case .sentenceBuild, .wordProblemStep, .letterTracing:
+        case .shapesTap:
+            let target = ShapeBank.random()
+            let decoy = ShapeBank.decoys(excluding: target, count: 1)[0]
+            return build(
+                promptText: "What shape is this?",
+                spokenPrompt: "What shape is this?",
+                correct: target.displayName,
+                wrong: decoy.displayName
+            )
+
+        case .skipCountingTap:
+            let question = SkipCountingBank.random(forDifficulty: difficultyLevel)
+            let wrong = question.choices.first { $0 != question.answer } ?? question.answer + 1
+            return build(
+                promptText: "\(question.sequence.map(String.init).joined(separator: ", ")), ?",
+                spokenPrompt: "What comes next?",
+                correct: "\(question.answer)",
+                wrong: "\(wrong)"
+            )
+
+        case .placeValueTap:
+            let question = PlaceValueBank.random(forDifficulty: difficultyLevel)
+            let wrong = question.choices.first { $0 != question.answer } ?? question.answer + 1
+            return build(
+                promptText: "\(question.tens) tens and \(question.ones) ones = ?",
+                spokenPrompt: "\(question.tens) tens and \(question.ones) ones make what number?",
+                correct: "\(question.answer)",
+                wrong: "\(wrong)"
+            )
+
+        case .sentenceBuild, .wordProblemStep, .letterTracing, .measurementTap:
             return nil
         }
     }

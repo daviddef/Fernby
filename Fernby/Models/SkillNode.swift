@@ -17,6 +17,10 @@ enum ActivityKind: String, Codable {
     case additionTap
     case subtractionTap
     case wordProblemStep
+    case shapesTap
+    case skipCountingTap
+    case placeValueTap
+    case measurementTap
 }
 
 struct SkillNode: Identifiable, Codable, Hashable {

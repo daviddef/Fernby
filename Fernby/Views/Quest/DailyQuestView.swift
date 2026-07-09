@@ -39,12 +39,13 @@ final class DailyQuestViewModel: ObservableObject {
 struct DailyQuestView: View {
     let onComplete: () -> Void
 
-    /// Three bonus-round games with genuinely different mechanics (flip a
-    /// card, sort into a bucket, listen and point) rather than one game
-    /// shown every single quest — picked once per quest so the reward lap
-    /// at the end varies session to session.
+    /// Five bonus-round games with genuinely different mechanics (flip a
+    /// card, sort into a bucket, listen and point, explore a word, decorate
+    /// a garden) rather than one game shown every single quest — picked
+    /// once per quest so the reward lap at the end varies session to
+    /// session.
     private enum BonusGame: CaseIterable {
-        case matching, sorting, listenAndPoint
+        case matching, sorting, listenAndPoint, wordExplorer, garden
     }
 
     @StateObject private var viewModel = DailyQuestViewModel()
@@ -108,6 +109,10 @@ struct DailyQuestView: View {
             SortingGameView(onDone: { hasShownBonusRound = true })
         case .listenAndPoint:
             ListenAndPointView(onDone: { hasShownBonusRound = true })
+        case .wordExplorer:
+            WordExplorerView(onDone: { hasShownBonusRound = true })
+        case .garden:
+            GardenView(onDone: { hasShownBonusRound = true })
         }
     }
 

@@ -6,6 +6,8 @@ import SwiftUI
 struct CompanionJournalView: View {
     @ObservedObject var progressStore: ProgressStore
 
+    @State private var showingWardrobe = false
+
     private var learnedAbilities: [CompanionAbility] {
         SkillGraph.all
             .filter { progressStore.progress(for: $0.id).mastered }
@@ -38,6 +40,19 @@ struct CompanionJournalView: View {
                 }
             }
             .navigationTitle("\(CompanionAbilityCatalog.companionName)'s Journal")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        showingWardrobe = true
+                    } label: {
+                        Image(systemName: "tshirt.fill")
+                    }
+                    .accessibilityLabel("Dress up \(CompanionAbilityCatalog.companionName)")
+                }
+            }
+            .sheet(isPresented: $showingWardrobe) {
+                CompanionWardrobeView(progressStore: progressStore, onDismiss: { showingWardrobe = false })
+            }
         }
     }
 }

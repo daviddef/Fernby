@@ -16,6 +16,8 @@ struct WorldMapView: View {
     @State private var showingParentGate = false
     @State private var showingSettings = false
     @State private var showingJournal = false
+    @State private var showingPracticeGrounds = false
+    @State private var exploringBiome: Biome?
     @State private var returnGreeting: String?
 
     private var unlockedBiomesInOrder: [Biome] {
@@ -53,6 +55,15 @@ struct WorldMapView: View {
             .padding(.horizontal)
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    Haptics.shared.tap()
+                    showingPracticeGrounds = true
+                } label: {
+                    Image(systemName: "gamecontroller.fill")
+                }
+                .accessibilityLabel("Practice Grounds")
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     showingParentGate = true
@@ -86,6 +97,12 @@ struct WorldMapView: View {
         .sheet(isPresented: $showingJournal) {
             CompanionJournalView(progressStore: progressStore)
         }
+        .fullScreenCover(isPresented: $showingPracticeGrounds) {
+            PracticeGroundsView(onDismiss: { showingPracticeGrounds = false })
+        }
+        .sheet(item: $exploringBiome) { biome in
+            BiomeExploreView(biome: biome, onDone: { exploringBiome = nil })
+        }
         .onAppear { showReturnGreetingIfNeeded() }
     }
 
@@ -114,14 +131,29 @@ struct WorldMapView: View {
     private func biomeRow(_ biome: Biome, isUnlocked: Bool, leansLeft: Bool) -> some View {
         HStack {
             if !leansLeft { Spacer(minLength: 40) }
-            BiomeNodeView(
-                title: biome.title,
-                emoji: biome.emoji,
-                accentColor: biome.accentColor,
-                isLocked: !isUnlocked,
-                isCurrent: isUnlocked && biome.id == unlockedBiomesInOrder.last?.id,
-                action: { startQuest() }
-            )
+            ZStack(alignment: .topTrailing) {
+                BiomeNodeView(
+                    title: biome.title,
+                    emoji: biome.emoji,
+                    accentColor: biome.accentColor,
+                    isLocked: !isUnlocked,
+                    isCurrent: isUnlocked && biome.id == unlockedBiomesInOrder.last?.id,
+                    action: { startQuest() }
+                )
+                if isUnlocked {
+                    Button {
+                        Haptics.shared.tap()
+                        exploringBiome = biome
+                    } label: {
+                        Image(systemName: "magnifyingglass.circle.fill")
+                            .font(.system(size: 26))
+                            .foregroundStyle(biome.accentColor)
+                            .background(Circle().fill(.white))
+                    }
+                    .offset(x: -2, y: 4)
+                    .accessibilityLabel("Explore \(biome.title)")
+                }
+            }
             if leansLeft { Spacer(minLength: 40) }
         }
     }

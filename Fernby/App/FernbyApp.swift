@@ -43,8 +43,28 @@ struct FernbyApp: App {
     private var debugRoot: some View {
         if let nodeID = ProcessInfo.processInfo.environment["WT_DEBUG_NODE"], let node = SkillGraph.node(id: nodeID) {
             ActivityContainerView(node: node, instanceID: 0, onFirstResponse: { _ in }, onAdvance: {})
+        } else if let screen = ProcessInfo.processInfo.environment["WT_DEBUG_SCREEN"] {
+            debugScreen(screen)
         } else {
             RootView()
+        }
+    }
+
+    /// Same idea as WT_DEBUG_NODE, for screens that aren't a single skill
+    /// node: WT_DEBUG_SCREEN=practice|wardrobe|wordExplorer|garden|explore
+    /// jumps straight to Practice Grounds, the companion wardrobe, the Word
+    /// Explorer/Garden bonus games, or a biome-explore scene, bypassing
+    /// however many quests it would otherwise take to reach that surface
+    /// normally.
+    @ViewBuilder
+    private func debugScreen(_ name: String) -> some View {
+        switch name {
+        case "practice": PracticeGroundsView(onDismiss: {})
+        case "wardrobe": CompanionWardrobeView(progressStore: .shared, onDismiss: {})
+        case "wordExplorer": WordExplorerView(onDone: {})
+        case "garden": GardenView(onDone: {})
+        case "explore": BiomeExploreView(biome: Biome.all[0], onDone: {})
+        default: RootView()
         }
     }
     #endif

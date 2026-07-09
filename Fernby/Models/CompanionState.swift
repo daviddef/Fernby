@@ -6,6 +6,7 @@ import Foundation
 struct CompanionState: Codable {
     var totalActivitiesCompleted: Int = 0
     var daysPlayed: Set<String> = []   // ISO "yyyy-MM-dd" strings, kept for future stats only — never surfaced as a streak
+    var selectedAccessory: CompanionAccessory = .none
 
     static let stageCount = 5
     static let activitiesPerStage = 15

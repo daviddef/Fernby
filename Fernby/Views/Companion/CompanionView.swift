@@ -17,6 +17,14 @@ struct CompanionView: View {
     var body: some View {
         VStack(spacing: 6) {
             CompanionArtView(stage: stage, size: size)
+                .overlay(alignment: .top) {
+                    if let emoji = progressStore.companion.selectedAccessory.emoji {
+                        Text(emoji)
+                            .font(.system(size: size * 0.32))
+                            .offset(y: -size * 0.12)
+                            .accessibilityHidden(true)
+                    }
+                }
                 .offset(y: bobbing ? -4 : 4)
                 .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: bobbing)
                 .onAppear { bobbing = true }

@@ -51,11 +51,9 @@ struct FernbyApp: App {
     }
 
     /// Same idea as WT_DEBUG_NODE, for screens that aren't a single skill
-    /// node: WT_DEBUG_SCREEN=practice|wardrobe|wordExplorer|garden|explore
-    /// jumps straight to Practice Grounds, the companion wardrobe, the Word
-    /// Explorer/Garden bonus games, or a biome-explore scene, bypassing
-    /// however many quests it would otherwise take to reach that surface
-    /// normally.
+    /// node: WT_DEBUG_SCREEN=practice|wardrobe|wordExplorer|garden|explore|
+    /// scramble|crissCross jumps straight to that surface, bypassing
+    /// however many quests it would otherwise take to reach it normally.
     @ViewBuilder
     private func debugScreen(_ name: String) -> some View {
         switch name {
@@ -64,6 +62,8 @@ struct FernbyApp: App {
         case "wordExplorer": WordExplorerView(onDone: {})
         case "garden": GardenView(onDone: {})
         case "explore": BiomeExploreView(biome: Biome.all[0], onDone: {})
+        case "scramble": LetterScrambleView(onDone: {})
+        case "crissCross": CrissCrossView(onDone: {})
         default: RootView()
         }
     }

@@ -55,7 +55,13 @@ struct DailyQuestView: View {
     @State private var coachMomentNode: SkillNode?
     @State private var hasShownCoachMoment = false
     @State private var hasShownBonusRound = false
-    @State private var bonusGame: BonusGame = BonusGame.allCases.randomElement()!
+    // Placeholder — the real pick happens in onAppear, since it needs to
+    // check Voice.shared.enabled (MainActor-isolated, not safe to read from
+    // a property initializer) to exclude Listen and Point when muted: that
+    // bonus game is audio-only by design (see ListenAndPointView), so it's
+    // an unplayable dead end — no visual prompt, and "Hear it again" is
+    // silent too — for anyone who's turned spoken instructions off.
+    @State private var bonusGame: BonusGame = .matching
 
     var body: some View {
         Group {
@@ -97,6 +103,8 @@ struct DailyQuestView: View {
         .onAppear {
             Haptics.shared.prepareAll()
             coachMomentNode = ReviewScheduler.dueNode()
+            let eligibleGames = Voice.shared.enabled ? BonusGame.allCases : BonusGame.allCases.filter { $0 != .listenAndPoint }
+            bonusGame = eligibleGames.randomElement()!
         }
     }
 

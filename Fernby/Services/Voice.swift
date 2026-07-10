@@ -22,6 +22,24 @@ final class Voice {
 
     private init() {
         enabled = UserDefaults.standard.object(forKey: "wt.voiceEnabled") as? Bool ?? true
+
+        // Real bug, reported from a real device: with no audio session
+        // category configured, iOS defaults to `.soloAmbient`, which gets
+        // completely silenced by the phone's physical Ring/Silent switch —
+        // every spoken instruction in the app would be inaudible whenever
+        // that switch is flipped, with no in-app indication anything was
+        // wrong. `.playback` is what audio/video apps use specifically so
+        // content-critical sound isn't at the mercy of a hardware switch a
+        // parent might have flipped for an unrelated reason — appropriate
+        // here since spoken instructions aren't decorative, pre-readers
+        // depend on them to use the app at all.
+        do {
+            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.duckOthers])
+            try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+            // Falls back to default session behavior — better to keep
+            // running than crash over an audio session configuration issue.
+        }
     }
 
     func speak(_ text: String, interrupt: Bool = true) {

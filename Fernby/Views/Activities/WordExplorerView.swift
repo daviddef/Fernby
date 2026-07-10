@@ -36,6 +36,7 @@ struct WordExplorerView: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityLabel("Explore the word \(word.word)")
                 }
             }
 

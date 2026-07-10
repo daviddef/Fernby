@@ -13,6 +13,10 @@ struct GardenView: View {
     @State private var selectedEmoji: String = "🌸"
 
     private let palette = ["🌸", "🌼", "🌻", "🍄", "🪨", "🦋", "🐌", "⭐️"]
+    private let paletteNames: [String: String] = [
+        "🌸": "Cherry blossom", "🌼": "Daisy", "🌻": "Sunflower", "🍄": "Mushroom",
+        "🪨": "Rock", "🦋": "Butterfly", "🐌": "Snail", "⭐️": "Star",
+    ]
 
     var body: some View {
         VStack(spacing: 16) {
@@ -47,6 +51,8 @@ struct GardenView: View {
                             Haptics.shared.tap()
                             gardenStore.remove(id: item.id)
                         }
+                        .accessibilityLabel("\(paletteNames[item.emoji] ?? "Decoration") in the garden")
+                        .accessibilityHint("Double tap to remove")
                 }
             }
             .contentShape(Rectangle())
@@ -82,6 +88,8 @@ struct GardenView: View {
                         )
                 }
                 .buttonStyle(.plain)
+                .accessibilityLabel(paletteNames[emoji] ?? "Decoration")
+                .accessibilityHint(selectedEmoji == emoji ? "Selected. Tap the garden to place it." : "Double tap to select")
             }
         }
     }

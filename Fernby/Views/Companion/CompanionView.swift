@@ -7,6 +7,15 @@ struct CompanionView: View {
     @ObservedObject var progressStore: ProgressStore
     var size: CGFloat = 140
     var showsName: Bool = false
+    /// Off by default wherever a sibling view changes shape shortly after
+    /// appearing (e.g. CoachMomentView's brief ProgressView-to-question
+    /// transition) — starting this continuous offset animation before the
+    /// surrounding layout has settled leaves the rendered layer visually
+    /// stuck at its pre-transition position even though the view tree (and
+    /// hit-testing) correctly reflects the new layout, a real bug caught
+    /// from an on-device screenshot: the companion's face appeared detached
+    /// from its own frame, overlapping unrelated text below it.
+    var bobs: Bool = true
 
     @State private var bobbing = false
 
@@ -25,9 +34,9 @@ struct CompanionView: View {
                             .accessibilityHidden(true)
                     }
                 }
-                .offset(y: bobbing ? -4 : 4)
-                .animation(.easeInOut(duration: 1.6).repeatForever(autoreverses: true), value: bobbing)
-                .onAppear { bobbing = true }
+                .offset(y: bobs && bobbing ? -4 : 4)
+                .animation(bobs ? .easeInOut(duration: 1.6).repeatForever(autoreverses: true) : nil, value: bobbing)
+                .onAppear { if bobs { bobbing = true } }
 
             if showsName {
                 Text(stage.name)

@@ -33,9 +33,17 @@ enum MathFactBank {
             for b in 0...maxSum {
                 switch operation {
                 case .add:
-                    if a + b > 0 && a + b <= maxSum { facts.append(MathFact(a: a, b: b, operation: .add)) }
+                    // Both addends non-zero — the concrete counters (see
+                    // AdditionTapView) show two real groups being combined;
+                    // "0 + 4" rendered one group as empty air with a
+                    // floating "+" next to it, a real on-device visual bug.
+                    if a >= 1 && b >= 1 && a + b <= maxSum { facts.append(MathFact(a: a, b: b, operation: .add)) }
                 case .subtract:
-                    if a - b >= 0 && a <= maxSum { facts.append(MathFact(a: a, b: b, operation: .subtract)) }
+                    // Starting group must be non-empty — "0 - 0" rendered
+                    // no counters at all, a blank-looking question. Taking
+                    // away zero (b == 0) is still fine and pedagogically
+                    // real: a full group, nothing crossed out.
+                    if a >= 1 && a - b >= 0 && a <= maxSum { facts.append(MathFact(a: a, b: b, operation: .subtract)) }
                 }
             }
         }

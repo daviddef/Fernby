@@ -24,7 +24,7 @@ struct SentenceBuildView: View {
 
     var body: some View {
         VStack(spacing: 28) {
-            Text("Drag the words into order")
+            Text("Put the words in order")
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
 
             HStack(spacing: 10) {

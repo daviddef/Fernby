@@ -44,10 +44,14 @@ struct CrissCrossView: View {
                         Text(puzzle.across.emoji).font(.system(size: 34))
                         Text("Across").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
                     }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Across clue picture")
                     VStack(spacing: 4) {
                         Text(puzzle.down.emoji).font(.system(size: 34))
                         Text("Down").font(.system(size: 12, weight: .semibold, design: .rounded)).foregroundStyle(.secondary)
                     }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Down clue picture")
                 }
 
                 grid
@@ -68,6 +72,8 @@ struct CrissCrossView: View {
                         .buttonStyle(.plain)
                         .disabled(tile.isPlaced || isSolved)
                         .opacity(tile.isPlaced ? 0 : 1)
+                        .accessibilityLabel("Letter \(tile.letter.uppercased())")
+                        .accessibilityHint("Double tap to place in the next empty cell")
                     }
                 }
 
@@ -108,6 +114,13 @@ struct CrissCrossView: View {
             }
         }
         .frame(width: CGFloat(maxCol + 1) * Self.cellSize, height: CGFloat(maxRow + 1) * Self.cellSize)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(gridAccessibilitySummary)
+    }
+
+    private var gridAccessibilitySummary: String {
+        let filledCount = fillSequence.filter { filledLetters[$0.id] != nil }.count
+        return "Puzzle grid, \(filledCount) of \(fillSequence.count) letters placed"
     }
 
     private func setUp() {

@@ -46,6 +46,8 @@ struct LetterScrambleView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(slot == nil || isSolved)
+                    .accessibilityLabel(slot.map { "\($0.letter.uppercased()), placed" } ?? "Empty letter slot")
+                    .accessibilityHint(slot == nil ? "" : "Double tap to return this letter to the tray")
                 }
             }
 
@@ -65,6 +67,8 @@ struct LetterScrambleView: View {
                     .buttonStyle(.plain)
                     .disabled(tile.isPlaced || isSolved)
                     .opacity(tile.isPlaced ? 0 : 1)
+                    .accessibilityLabel("Letter \(tile.letter.uppercased())")
+                    .accessibilityHint("Double tap to place in the next empty slot")
                 }
             }
 

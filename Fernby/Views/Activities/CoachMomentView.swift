@@ -25,7 +25,7 @@ struct CoachMomentView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            CompanionView(progressStore: ProgressStore.shared, size: 120)
+            CompanionView(progressStore: ProgressStore.shared, size: 120, bobs: false)
 
             if let prompt {
                 switch stage {

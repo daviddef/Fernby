@@ -36,6 +36,8 @@ struct BiomeExploreView: View {
                                 .rotationEffect(.degrees(wigglingIndex == index ? 14 : 0))
                         }
                         .buttonStyle(.plain)
+                        .accessibilityLabel("Explore spot \(index + 1)")
+                        .accessibilityHint("Double tap to see what's there")
                     }
                 }
 

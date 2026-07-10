@@ -9,16 +9,23 @@ import SwiftUI
 /// without doing that — Voice can be muted and the activity still gives
 /// the child something concrete to check their guess against.
 ///
-/// Shared by two nodes: `reading.sightWords` (Dolch pre-primer, via
-/// SightWordBank) and `reading.sightWordsAdvanced` (Dolch primer, via
-/// SightWordAdvancedBank) — same interaction, different tier.
+/// Shared by four nodes, one per Dolch tier: `reading.sightWords`
+/// (pre-primer), `reading.sightWordsAdvanced` (primer), `reading.
+/// sightWordsTier3` (1st grade), `reading.sightWordsTier4` (2nd grade) —
+/// same interaction throughout, only the word pool changes.
 struct SightWordTapView: View {
     let nodeID: String
     let onFirstResponse: (Bool) -> Void
     let onAdvance: () -> Void
 
-    private var isAdvancedVariant: Bool { nodeID == "reading.sightWordsAdvanced" }
-    private var bank: [String] { isAdvancedVariant ? SightWordAdvancedBank.all : SightWordBank.all }
+    private var bank: [String] {
+        switch nodeID {
+        case "reading.sightWordsAdvanced": return SightWordAdvancedBank.all
+        case "reading.sightWordsTier3": return SightWordTier3Bank.all
+        case "reading.sightWordsTier4": return SightWordTier4Bank.all
+        default: return SightWordBank.all
+        }
+    }
 
     // Can't reference `nodeID` in a property initializer — setUpQuestion(),
     // called on appear, immediately overwrites this with the real pick.

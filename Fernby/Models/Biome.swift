@@ -67,6 +67,16 @@ struct Biome: Identifiable {
             accentColor: Color(red: 0.78, green: 0.65, blue: 0.42),
             gateNodeIDs: ["reading.digraphWords", "math.measurement"]
         ),
+        Biome(
+            id: "twilightTerrace", title: "Twilight Terrace", emoji: "🌆",
+            accentColor: Color(red: 0.65, green: 0.45, blue: 0.55),
+            gateNodeIDs: ["reading.sightWordsTier3", "math.time"]
+        ),
+        Biome(
+            id: "goldenHarbor", title: "Golden Harbor", emoji: "🪙",
+            accentColor: Color(red: 0.85, green: 0.68, blue: 0.32),
+            gateNodeIDs: ["reading.sightWordsTier4", "math.money"]
+        ),
     ]
 
     /// The last biome has no 6th biome to gate, so its own "finish line" is

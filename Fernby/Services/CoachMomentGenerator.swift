@@ -77,7 +77,13 @@ enum CoachMomentGenerator {
             )
 
         case .sightWordTap:
-            let bank: [String] = node.id == "reading.sightWordsAdvanced" ? SightWordAdvancedBank.all : SightWordBank.all
+            let bank: [String]
+            switch node.id {
+            case "reading.sightWordsAdvanced": bank = SightWordAdvancedBank.all
+            case "reading.sightWordsTier3": bank = SightWordTier3Bank.all
+            case "reading.sightWordsTier4": bank = SightWordTier4Bank.all
+            default: bank = SightWordBank.all
+            }
             let target = bank.randomWord()
             let decoy = bank.decoyWords(excluding: target, count: 1)[0]
             return build(
@@ -113,6 +119,46 @@ enum CoachMomentGenerator {
             return build(
                 promptText: "\(question.tens) tens and \(question.ones) ones = ?",
                 spokenPrompt: "\(question.tens) tens and \(question.ones) ones make what number?",
+                correct: "\(question.answer)",
+                wrong: "\(wrong)"
+            )
+
+        case .tellingTimeTap:
+            let question = TimeBank.random()
+            let wrong = question.choices.first { $0 != question.correctText } ?? question.correctText
+            return build(
+                promptText: "What time is it?",
+                spokenPrompt: "What time is it?",
+                correct: question.correctText,
+                wrong: wrong
+            )
+
+        case .moneyTap:
+            let question = CoinBank.random(forDifficulty: difficultyLevel)
+            let wrong = question.choices.first { $0 != question.total } ?? question.total + 1
+            return build(
+                promptText: "How much money is this?",
+                spokenPrompt: "How much money is this?",
+                correct: "\(question.total)¢",
+                wrong: "\(wrong)¢"
+            )
+
+        case .dataGraphTap:
+            let question = DataGraphBank.random()
+            let wrong = question.choices.first { $0 != question.answer } ?? question.answer
+            return build(
+                promptText: question.promptText,
+                spokenPrompt: question.spokenPrompt,
+                correct: question.answer,
+                wrong: wrong
+            )
+
+        case .multiplicationTap:
+            let question = MultiplicationBank.random(forDifficulty: difficultyLevel)
+            let wrong = question.choices.first { $0 != question.answer } ?? question.answer + 1
+            return build(
+                promptText: "\(question.groupCount) groups of \(question.itemsPerGroup) = ?",
+                spokenPrompt: "\(question.groupCount) groups of \(question.itemsPerGroup). How many in total?",
                 correct: "\(question.answer)",
                 wrong: "\(wrong)"
             )

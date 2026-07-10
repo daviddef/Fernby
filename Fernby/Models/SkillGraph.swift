@@ -14,7 +14,9 @@ enum SkillGraph {
         SkillNode(id: "reading.sightWordsAdvanced", subject: .reading, title: "More Sight Words", order: 6, activityKind: .sightWordTap),
         SkillNode(id: "reading.cvcWords", subject: .reading, title: "CVC Words", order: 7, activityKind: .wordBuilding),
         SkillNode(id: "reading.digraphWords", subject: .reading, title: "Digraph Words", order: 8, activityKind: .wordBuilding),
-        SkillNode(id: "reading.sentences", subject: .reading, title: "Simple Sentences", order: 9, activityKind: .sentenceBuild),
+        SkillNode(id: "reading.sightWordsTier3", subject: .reading, title: "1st-Grade Sight Words", order: 9, activityKind: .sightWordTap),
+        SkillNode(id: "reading.sightWordsTier4", subject: .reading, title: "2nd-Grade Sight Words", order: 10, activityKind: .sightWordTap),
+        SkillNode(id: "reading.sentences", subject: .reading, title: "Simple Sentences", order: 11, activityKind: .sentenceBuild),
     ]
 
     static let math: [SkillNode] = [
@@ -26,7 +28,11 @@ enum SkillGraph {
         SkillNode(id: "math.subtraction", subject: .math, title: "Subtraction", order: 5, activityKind: .subtractionTap),
         SkillNode(id: "math.placeValue", subject: .math, title: "Place Value", order: 6, activityKind: .placeValueTap),
         SkillNode(id: "math.measurement", subject: .math, title: "Measurement", order: 7, activityKind: .measurementTap),
-        SkillNode(id: "math.wordProblems", subject: .math, title: "Word Problems", order: 8, activityKind: .wordProblemStep),
+        SkillNode(id: "math.time", subject: .math, title: "Telling Time", order: 8, activityKind: .tellingTimeTap),
+        SkillNode(id: "math.money", subject: .math, title: "Money", order: 9, activityKind: .moneyTap),
+        SkillNode(id: "math.dataGraphs", subject: .math, title: "Graphs", order: 10, activityKind: .dataGraphTap),
+        SkillNode(id: "math.multiplication", subject: .math, title: "Equal Groups", order: 11, activityKind: .multiplicationTap),
+        SkillNode(id: "math.wordProblems", subject: .math, title: "Word Problems", order: 12, activityKind: .wordProblemStep),
     ]
 
     static var all: [SkillNode] { reading + math }

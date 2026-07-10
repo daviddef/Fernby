@@ -61,6 +61,14 @@ struct ActivityContainerView: View {
                 PlaceValueView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             case .measurementTap:
                 MeasurementView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .tellingTimeTap:
+                TellingTimeView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .moneyTap:
+                MoneyView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .dataGraphTap:
+                DataGraphView(onFirstResponse: onFirstResponse, onAdvance: onAdvance)
+            case .multiplicationTap:
+                MultiplicationView(difficultyLevel: difficultyLevel, onFirstResponse: onFirstResponse, onAdvance: onAdvance)
             }
         }
         .id(instanceID) // fresh identity per occurrence, even repeats of the same node

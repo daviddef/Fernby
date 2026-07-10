@@ -44,6 +44,15 @@ struct LetterTracingView: View {
     @State private var completedStrokes: [[CGPoint]] = []
     @State private var currentStroke: [CGPoint] = []
     @State private var inkCells: Set<GridCell> = []
+    /// The exact bitmap the ink cells were computed from, displayed as the
+    /// guide instead of a separately-laid-out SwiftUI Text — a real
+    /// TestFlight report caught a well-traced letter failing anyway,
+    /// because the visible guide (SwiftUI Text layout) and the scoring
+    /// mask (raw UIKit NSString.draw with its own centering math) are two
+    /// independent rendering paths with no guarantee they align pixel for
+    /// pixel. Showing the actual scored bitmap makes misalignment
+    /// structurally impossible instead of something to keep re-tuning.
+    @State private var guideImage: UIImage?
     @State private var hasRespondedFirstTime = false
     @State private var isDone = false
     @State private var feedback: AnswerFeedbackKind?
@@ -55,9 +64,11 @@ struct LetterTracingView: View {
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
 
             ZStack {
-                Text(target.letter.uppercased())
-                    .font(.system(size: 220, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Color.secondary.opacity(0.22))
+                if let guideImage {
+                    Image(uiImage: guideImage)
+                        .resizable()
+                        .opacity(0.3)
+                }
 
                 Canvas { context, _ in
                     for stroke in completedStrokes + [currentStroke] {
@@ -115,7 +126,9 @@ struct LetterTracingView: View {
         RecentItemTracker.shared.record(target.letter, for: "letterTracing")
         completedStrokes = []
         currentStroke = []
-        inkCells = Self.computeInkCells(for: target.letter)
+        let rendered = Self.renderGuide(for: target.letter)
+        inkCells = rendered?.inkCells ?? []
+        guideImage = rendered?.image
         hasRespondedFirstTime = false
         isDone = false
         feedback = nil
@@ -177,22 +190,22 @@ struct LetterTracingView: View {
         return (recall, precision)
     }
 
-    /// Rasterizes the guide letter — same font/size/weight as the on-screen
-    /// Text — into a coarse grid of "ink present" cells. Done once per
-    /// question rather than per pixel-perfect comparison, so this stays
-    /// fast and just as generous as intended: a whole cell (14pt) counts as
-    /// covered the moment any part of the stroke passes through it.
-    private static func computeInkCells(for letter: String) -> Set<GridCell> {
+    /// Rasterizes the guide letter into a single bitmap that is both the
+    /// scoring mask (via `inkCells`, read off the alpha channel) and the
+    /// on-screen guide the child traces against — one source of truth
+    /// instead of two independent renders that have to coincidentally
+    /// agree. A transparent background with an opaque black glyph, so
+    /// "ink present" is just "alpha channel is set," and displaying the
+    /// image at low opacity gives the same light-guide look the old
+    /// separate SwiftUI Text used.
+    private static func renderGuide(for letter: String) -> (image: UIImage, inkCells: Set<GridCell>)? {
         let size = Int(canvasSize)
-        guard let colorSpace = CGColorSpace(name: CGColorSpace.genericGrayGamma2_2),
-              let context = CGContext(
-                data: nil, width: size, height: size,
-                bitsPerComponent: 8, bytesPerRow: 0,
-                space: colorSpace, bitmapInfo: CGImageAlphaInfo.none.rawValue
-              ) else { return [] }
-
-        context.setFillColor(gray: 1, alpha: 1)
-        context.fill(CGRect(x: 0, y: 0, width: size, height: size))
+        let bytesPerPixel = 4
+        guard let context = CGContext(
+            data: nil, width: size, height: size,
+            bitsPerComponent: 8, bytesPerRow: size * bytesPerPixel,
+            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        ) else { return nil }
 
         UIGraphicsPushContext(context)
         let descriptor = UIFont.systemFont(ofSize: 220, weight: .heavy).fontDescriptor.withDesign(.rounded)
@@ -204,9 +217,9 @@ struct LetterTracingView: View {
         string.draw(at: origin, withAttributes: attributes)
         UIGraphicsPopContext()
 
-        guard let data = context.data else { return [] }
-        // Don't assume bytesPerRow == width — passing bytesPerRow: 0 lets
-        // CG choose its own (possibly padded) row stride.
+        guard let cgImage = context.makeImage(), let data = context.data else { return nil }
+        // Don't assume bytesPerRow == width * bytesPerPixel — passing an
+        // explicit stride lets CG pad rows if it wants to.
         let bytesPerRow = context.bytesPerRow
         let buffer = data.bindMemory(to: UInt8.self, capacity: bytesPerRow * size)
 
@@ -221,7 +234,8 @@ struct LetterTracingView: View {
                     for dx in 0..<gridStep {
                         let x = col * gridStep + dx
                         guard x < size else { continue }
-                        if buffer[y * bytesPerRow + x] < 200 {
+                        let alphaByteOffset = y * bytesPerRow + x * bytesPerPixel + 3
+                        if buffer[alphaByteOffset] > 20 {
                             hasInk = true
                             break rowScan
                         }
@@ -230,6 +244,6 @@ struct LetterTracingView: View {
                 if hasInk { cells.insert(GridCell(row: row, col: col)) }
             }
         }
-        return cells
+        return (UIImage(cgImage: cgImage), cells)
     }
 }

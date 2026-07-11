@@ -1,0 +1,50 @@
+import SwiftUI
+
+/// Minimal left-to-right, top-to-bottom flow layout — used by StorybookView
+/// to lay out a sentence as individually tappable word chips (needed for
+/// tap-any-word-to-hear-it and per-word highlight), which an HStack can't
+/// wrap and a single Text can't make individually tappable.
+struct WrapLayout: Layout {
+    var spacing: CGFloat = 8
+    var lineSpacing: CGFloat = 10
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxWidth = proposal.width ?? .infinity
+        var x: CGFloat = 0
+        var y: CGFloat = 0
+        var rowHeight: CGFloat = 0
+        var contentWidth: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x > 0, x + size.width > maxWidth {
+                contentWidth = max(contentWidth, x - spacing)
+                x = 0
+                y += rowHeight + lineSpacing
+                rowHeight = 0
+            }
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+        contentWidth = max(contentWidth, x - spacing)
+        return CGSize(width: maxWidth.isFinite ? maxWidth : contentWidth, height: y + rowHeight)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x: CGFloat = bounds.minX
+        var y: CGFloat = bounds.minY
+        var rowHeight: CGFloat = 0
+
+        for subview in subviews {
+            let size = subview.sizeThatFits(.unspecified)
+            if x > bounds.minX, x + size.width > bounds.maxX {
+                x = bounds.minX
+                y += rowHeight + lineSpacing
+                rowHeight = 0
+            }
+            subview.place(at: CGPoint(x: x, y: y), anchor: .topLeading, proposal: ProposedViewSize(size))
+            x += size.width + spacing
+            rowHeight = max(rowHeight, size.height)
+        }
+    }
+}

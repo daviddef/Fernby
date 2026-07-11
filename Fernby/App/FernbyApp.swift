@@ -53,8 +53,9 @@ struct FernbyApp: App {
     /// Same idea as WT_DEBUG_NODE, for screens that aren't a single skill
     /// node: WT_DEBUG_SCREEN=practice|wardrobe|wordExplorer|garden|explore|
     /// scramble|crissCross|settings|dashboard|phonicsPreview|journal|
-    /// questSummary|coachMoment jumps straight to that surface, bypassing
-    /// however many quests it would otherwise take to reach it normally.
+    /// questSummary|coachMoment|arcade|storybook jumps straight to that
+    /// surface, bypassing however many quests it would otherwise take to
+    /// reach it normally.
     @ViewBuilder
     private func debugScreen(_ name: String) -> some View {
         switch name {
@@ -79,6 +80,8 @@ struct FernbyApp: App {
         case "coachMoment": CoachMomentView(node: SkillGraph.all[1], onDone: {})
         case "parentGate": ParentGateView(onPassed: {}, onCancel: {})
         case "placement": PlacementQuestView(onComplete: {})
+        case "arcade": ArcadeView(onDismiss: {})
+        case "storybook": StorybookView(onDismiss: {})
         default: RootView()
         }
     }

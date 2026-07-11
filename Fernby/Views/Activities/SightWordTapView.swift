@@ -9,10 +9,11 @@ import SwiftUI
 /// without doing that — Voice can be muted and the activity still gives
 /// the child something concrete to check their guess against.
 ///
-/// Shared by four nodes, one per Dolch tier: `reading.sightWords`
+/// Shared by five nodes, one per Dolch tier: `reading.sightWords`
 /// (pre-primer), `reading.sightWordsAdvanced` (primer), `reading.
-/// sightWordsTier3` (1st grade), `reading.sightWordsTier4` (2nd grade) —
-/// same interaction throughout, only the word pool changes.
+/// sightWordsTier3` (1st grade), `reading.sightWordsTier4` (2nd grade),
+/// `reading.sightWordsTier5` (3rd grade) — same interaction throughout,
+/// only the word pool changes.
 struct SightWordTapView: View {
     let nodeID: String
     let onFirstResponse: (Bool) -> Void
@@ -23,6 +24,7 @@ struct SightWordTapView: View {
         case "reading.sightWordsAdvanced": return SightWordAdvancedBank.all
         case "reading.sightWordsTier3": return SightWordTier3Bank.all
         case "reading.sightWordsTier4": return SightWordTier4Bank.all
+        case "reading.sightWordsTier5": return SightWordTier5Bank.all
         default: return SightWordBank.all
         }
     }

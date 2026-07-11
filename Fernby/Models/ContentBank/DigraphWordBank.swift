@@ -22,6 +22,34 @@ enum DigraphWordBank {
         BuildableWord(word: "corn", emoji: "🌽", letters: ["c", "or", "n"]),
         BuildableWord(word: "owl", emoji: "🦉", letters: ["ow", "l"]),
         BuildableWord(word: "coin", emoji: "🪙", letters: ["c", "oi", "n"]),
+        // 12 more words from the original 14 digraph patterns.
+        BuildableWord(word: "shed", emoji: "🏚️", letters: ["sh", "e", "d"]),
+        BuildableWord(word: "chin", emoji: "😐", letters: ["ch", "i", "n"]),
+        BuildableWord(word: "path", emoji: "🛤️", letters: ["p", "a", "th"]),
+        BuildableWord(word: "sing", emoji: "🎤", letters: ["s", "i", "ng"]),
+        BuildableWord(word: "long", emoji: "📏", letters: ["l", "o", "ng"]),
+        BuildableWord(word: "tail", emoji: "🐒", letters: ["t", "ai", "l"]),
+        BuildableWord(word: "tree", emoji: "🌳", letters: ["t", "r", "ee"]),
+        BuildableWord(word: "light", emoji: "🔆", letters: ["l", "igh", "t"]),
+        BuildableWord(word: "boat", emoji: "⛵", letters: ["b", "oa", "t"]),
+        BuildableWord(word: "moon", emoji: "🌕", letters: ["m", "oo", "n"]),
+        BuildableWord(word: "fur", emoji: "🐻", letters: ["f", "ur"]),
+        BuildableWord(word: "cow", emoji: "🐄", letters: ["c", "ow"]),
+        // 12 more from the 5 new patterns just added to DigraphBank (ay,
+        // oy, aw, wh, ea) — every new phoneme gets real words to read, not
+        // just an isolated-sound flashcard.
+        BuildableWord(word: "day", emoji: "📅", letters: ["d", "ay"]),
+        BuildableWord(word: "boy", emoji: "👦", letters: ["b", "oy"]),
+        BuildableWord(word: "toy", emoji: "🧸", letters: ["t", "oy"]),
+        BuildableWord(word: "saw", emoji: "🪚", letters: ["s", "aw"]),
+        BuildableWord(word: "paw", emoji: "🐾", letters: ["p", "aw"]),
+        BuildableWord(word: "wheel", emoji: "🛞", letters: ["wh", "ee", "l"]),
+        BuildableWord(word: "tea", emoji: "🍵", letters: ["t", "ea"]),
+        BuildableWord(word: "pea", emoji: "🫛", letters: ["p", "ea"]),
+        BuildableWord(word: "sea", emoji: "🌊", letters: ["s", "ea"]),
+        BuildableWord(word: "leaf", emoji: "🍃", letters: ["l", "ea", "f"]),
+        BuildableWord(word: "beach", emoji: "🏖️", letters: ["b", "ea", "ch"]),
+        BuildableWord(word: "peach", emoji: "🍑", letters: ["p", "ea", "ch"]),
     ]
 
     static func random(avoiding recent: Set<String> = []) -> BuildableWord {

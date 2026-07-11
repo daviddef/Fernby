@@ -16,7 +16,8 @@ enum SkillGraph {
         SkillNode(id: "reading.digraphWords", subject: .reading, title: "Digraph Words", order: 8, activityKind: .wordBuilding),
         SkillNode(id: "reading.sightWordsTier3", subject: .reading, title: "1st-Grade Sight Words", order: 9, activityKind: .sightWordTap),
         SkillNode(id: "reading.sightWordsTier4", subject: .reading, title: "2nd-Grade Sight Words", order: 10, activityKind: .sightWordTap),
-        SkillNode(id: "reading.sentences", subject: .reading, title: "Simple Sentences", order: 11, activityKind: .sentenceBuild),
+        SkillNode(id: "reading.sightWordsTier5", subject: .reading, title: "3rd-Grade Sight Words", order: 11, activityKind: .sightWordTap),
+        SkillNode(id: "reading.sentences", subject: .reading, title: "Simple Sentences", order: 12, activityKind: .sentenceBuild),
     ]
 
     static let math: [SkillNode] = [

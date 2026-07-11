@@ -30,6 +30,7 @@ enum CompanionAbilityCatalog {
         CompanionAbility(nodeID: "reading.digraphWords", verb: "read words with two-letter sounds"),
         CompanionAbility(nodeID: "reading.sightWordsTier3", verb: "read a whole new set of tricky words"),
         CompanionAbility(nodeID: "reading.sightWordsTier4", verb: "read some of the trickiest words yet"),
+        CompanionAbility(nodeID: "reading.sightWordsTier5", verb: "read the whole Dolch word list, start to finish"),
         CompanionAbility(nodeID: "reading.sentences", verb: "read a whole sentence"),
         CompanionAbility(nodeID: "math.counting", verb: "count a group of objects"),
         CompanionAbility(nodeID: "math.numberID", verb: "match a number to its name"),

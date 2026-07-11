@@ -20,6 +20,16 @@ enum DigraphBank {
         LetterSoundEntry(letter: "ur", sound: "ur", exampleWord: "Purse", emoji: "👛"),
         LetterSoundEntry(letter: "ow", sound: "ow", exampleWord: "Cow", emoji: "🐄"),
         LetterSoundEntry(letter: "oi", sound: "oi", exampleWord: "Coin", emoji: "🪙"),
+        // Five more common early-phonics graphemes — this bank was 33
+        // patterns short of the ~70-90 typical synthetic-phonics scope
+        // (Letters and Sounds / Jolly Phonics-style sequences); these are
+        // the highest-value real gaps left before reaching for rarer,
+        // harder-to-picture patterns.
+        LetterSoundEntry(letter: "ay", sound: "ay", exampleWord: "Day", emoji: "🌅"),
+        LetterSoundEntry(letter: "oy", sound: "oy", exampleWord: "Boy", emoji: "👦"),
+        LetterSoundEntry(letter: "aw", sound: "aw", exampleWord: "Saw", emoji: "🪚"),
+        LetterSoundEntry(letter: "wh", sound: "wh", exampleWord: "Whale", emoji: "🐋"),
+        LetterSoundEntry(letter: "ea", sound: "ea", exampleWord: "Tea", emoji: "🍵"),
     ]
 
     static func random(avoiding recent: Set<String> = []) -> LetterSoundEntry {

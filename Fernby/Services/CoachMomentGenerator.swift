@@ -82,6 +82,7 @@ enum CoachMomentGenerator {
             case "reading.sightWordsAdvanced": bank = SightWordAdvancedBank.all
             case "reading.sightWordsTier3": bank = SightWordTier3Bank.all
             case "reading.sightWordsTier4": bank = SightWordTier4Bank.all
+            case "reading.sightWordsTier5": bank = SightWordTier5Bank.all
             default: bank = SightWordBank.all
             }
             let target = bank.randomWord()

@@ -10,8 +10,20 @@ struct WordProblem: Equatable {
 /// the skill being checked is translating words into an operation, not the
 /// arithmetic itself (already proven by the nodes before this one).
 enum WordProblemBank {
-    private static let addNouns = ["apples", "stickers", "shells", "blocks", "grapes"]
-    private static let subtractNouns = ["cookies", "balloons", "marbles", "leaves", "coins"]
+    // Expanded from 5 nouns each — with only 5 options and no repeat
+    // tracking here, the scenario noun cycled back within a handful of
+    // questions and the "story" half of the word problem went stale long
+    // before the underlying math did.
+    private static let addNouns = [
+        "apples", "stickers", "shells", "blocks", "grapes",
+        "crayons", "buttons", "marbles", "acorns", "feathers",
+        "coins", "beads", "leaves", "pebbles", "cards",
+    ]
+    private static let subtractNouns = [
+        "cookies", "balloons", "marbles", "leaves", "coins",
+        "crackers", "grapes", "stickers", "blocks", "petals",
+        "buttons", "shells", "pretzels", "acorns", "beads",
+    ]
 
     static func randomProblem(forDifficulty level: Int) -> WordProblem {
         let operation: MathOperation = Bool.random() ? .add : .subtract

@@ -44,6 +44,30 @@ enum WordBuildingBank {
         BuildableWord(word: "leg", emoji: "🦵", letters: ["l", "e", "g"]),
         BuildableWord(word: "log", emoji: "🪵", letters: ["l", "o", "g"]),
         BuildableWord(word: "sun", emoji: "☀️", letters: ["s", "u", "n"]),
+        // 20 more real CVC words from the same 19 taught letters — the
+        // original 27 were exhausted quickly by RecentItemTracker's
+        // avoid-immediate-repeat window, since a pool that small starts
+        // visibly cycling within a single quest.
+        BuildableWord(word: "red", emoji: "🔴", letters: ["r", "e", "d"]),
+        BuildableWord(word: "fan", emoji: "🪭", letters: ["f", "a", "n"]),
+        BuildableWord(word: "hop", emoji: "🐇", letters: ["h", "o", "p"]),
+        BuildableWord(word: "hug", emoji: "🤗", letters: ["h", "u", "g"]),
+        BuildableWord(word: "ham", emoji: "🍖", letters: ["h", "a", "m"]),
+        BuildableWord(word: "kid", emoji: "🧒", letters: ["k", "i", "d"]),
+        BuildableWord(word: "lip", emoji: "👄", letters: ["l", "i", "p"]),
+        BuildableWord(word: "mat", emoji: "🟫", letters: ["m", "a", "t"]),
+        BuildableWord(word: "mop", emoji: "🧹", letters: ["m", "o", "p"]),
+        BuildableWord(word: "mud", emoji: "🥾", letters: ["m", "u", "d"]),
+        BuildableWord(word: "mug", emoji: "☕", letters: ["m", "u", "g"]),
+        BuildableWord(word: "nut", emoji: "🥜", letters: ["n", "u", "t"]),
+        BuildableWord(word: "pot", emoji: "🍲", letters: ["p", "o", "t"]),
+        BuildableWord(word: "pet", emoji: "🐾", letters: ["p", "e", "t"]),
+        BuildableWord(word: "pen", emoji: "🖊️", letters: ["p", "e", "n"]),
+        BuildableWord(word: "rag", emoji: "🧻", letters: ["r", "a", "g"]),
+        BuildableWord(word: "rat", emoji: "🐀", letters: ["r", "a", "t"]),
+        BuildableWord(word: "rug", emoji: "🟪", letters: ["r", "u", "g"]),
+        BuildableWord(word: "tub", emoji: "🛁", letters: ["t", "u", "b"]),
+        BuildableWord(word: "cup", emoji: "🧋", letters: ["c", "u", "p"]),
     ]
 
     static func random(avoiding recent: Set<String> = []) -> BuildableWord {

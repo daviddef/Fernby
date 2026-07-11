@@ -1,6 +1,6 @@
 import Foundation
 
-struct StoryPage {
+struct StoryPage: Codable, Equatable {
     let text: String
     /// Emoji to illustrate the page — the noun's own emoji from whichever
     /// content bank supplied it, or nil for pages with no noun (rendered
@@ -8,9 +8,21 @@ struct StoryPage {
     let emoji: String?
 }
 
-struct Story {
+/// Codable/Identifiable so a generated story can be saved to StoryLibrary —
+/// a story is meant to become a keepsake a family can reread and show off,
+/// not a disposable quiz result, so it needs an identity and a save format.
+struct Story: Codable, Identifiable {
+    let id: UUID
     let title: String
     let pages: [StoryPage]
+    let createdAt: Date
+
+    init(title: String, pages: [StoryPage]) {
+        self.id = UUID()
+        self.title = title
+        self.pages = pages
+        self.createdAt = Date()
+    }
 }
 
 /// Generates a short, fully-decodable storybook from a child's own mastery

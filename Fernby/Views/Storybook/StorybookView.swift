@@ -25,37 +25,59 @@ private func tokenize(_ text: String) -> [StoryToken] {
     return tokens
 }
 
+private let relativeDateFormatter: RelativeDateTimeFormatter = {
+    let formatter = RelativeDateTimeFormatter()
+    formatter.unitsStyle = .short
+    return formatter
+}()
+
 /// The flagship feature this app's "wow" gap research pointed to directly:
 /// no competitor closes the loop from "what a child has actually mastered"
 /// to "a real, ownable story they can read cover to cover" — see
-/// StoryWeaver. This view is the reading experience itself: page-by-page,
-/// word-by-word highlighting synced to narration (karaoke-style, via
-/// AVSpeechSynthesizer's willSpeakRangeOfSpeechString), and tap-any-word-
-/// to-hear-it-alone — the same "text is always fully visible, audio is a
-/// bonus not a requirement" contract the rest of the app follows for muted
-/// play.
+/// StoryWeaver. Every generated story is saved to StoryLibrary immediately
+/// (a shelf, not a disposable screen) — the point is a growing set of books
+/// a family can reread and show off as concrete evidence of progress, not
+/// another one-shot activity. This view is both the shelf and the reading
+/// experience: page-by-page, word-by-word highlighting synced to narration
+/// (karaoke-style, via AVSpeechSynthesizer's willSpeakRangeOfSpeechString),
+/// and tap-any-word-to-hear-it-alone — the same "text is always fully
+/// visible, audio is a bonus not a requirement" contract the rest of the
+/// app follows for muted play.
 struct StorybookView: View {
     let onDismiss: () -> Void
 
     @ObservedObject private var progressStore = ProgressStore.shared
-    @State private var story: Story?
+    @ObservedObject private var library = StoryLibrary.shared
+    @State private var openStory: Story?
     @State private var pageIndex = 0
     @State private var tokens: [StoryToken] = []
     @State private var highlightedTokenID: Int?
 
+    private var isReadyForNewStory: Bool {
+        StoryWeaver.isReady(progressStore: progressStore)
+    }
+
     var body: some View {
         NavigationStack {
             Group {
-                if let story {
-                    pageView(story)
+                if let openStory {
+                    pageView(openStory)
                 } else {
-                    notReadyView
+                    shelfView
                 }
             }
-            .navigationTitle(story?.title ?? "Storybook")
+            .navigationTitle(openStory?.title ?? "\(CompanionAbilityCatalog.companionName)'s Storybooks")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
+                if openStory != nil {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Shelf") {
+                            Voice.shared.stop()
+                            openStory = nil
+                        }
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
                     Button("Done") {
                         Voice.shared.stop()
                         onDismiss()
@@ -63,25 +85,103 @@ struct StorybookView: View {
                 }
             }
         }
-        .onAppear {
-            story = StoryWeaver.generate(progressStore: progressStore)
+    }
+
+    // MARK: - Shelf
+
+    private var shelfView: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                if isReadyForNewStory {
+                    Button {
+                        startNewStory()
+                    } label: {
+                        Label("A New Story!", systemImage: "sparkles")
+                            .font(.system(size: 18, weight: .heavy, design: .rounded))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bigTap)
+                    .padding(.horizontal)
+                    .padding(.top, 20)
+                } else {
+                    VStack(spacing: 16) {
+                        CompanionView(progressStore: progressStore, size: 100, bobs: false)
+                        Text("A new story unlocks when you master \(StoryWeaver.nextRequirementTitle(progressStore: progressStore))!")
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 32)
+                    }
+                    .padding(.top, 20)
+                }
+
+                if library.stories.isEmpty {
+                    if isReadyForNewStory {
+                        Text("Your storybook shelf is empty — write your first story above!")
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 32)
+                            .padding(.top, 8)
+                    }
+                } else {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Your Storybooks")
+                            .font(.system(size: 16, weight: .heavy, design: .rounded))
+                            .padding(.horizontal)
+
+                        ForEach(library.storiesNewestFirst) { story in
+                            Button {
+                                openSavedStory(story)
+                            } label: {
+                                HStack(spacing: 14) {
+                                    Text(story.pages.first(where: { $0.emoji != nil })?.emoji ?? "📖")
+                                        .font(.system(size: 30))
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(story.title)
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundStyle(.primary)
+                                        Text(relativeDateFormatter.localizedString(for: story.createdAt, relativeTo: Date()))
+                                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right.circle.fill")
+                                        .foregroundStyle(Color.accentColor)
+                                }
+                                .padding(14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(Color(.secondarySystemBackground))
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top, 8)
+                }
+
+                Spacer(minLength: 24)
+            }
         }
     }
 
-    private var notReadyView: some View {
-        VStack(spacing: 20) {
-            CompanionView(progressStore: progressStore, size: 120, bobs: false)
-            Text("\(CompanionAbilityCatalog.companionName)'s storybook is almost ready!")
-                .font(.system(size: 20, weight: .heavy, design: .rounded))
-                .multilineTextAlignment(.center)
-            Text("Master \(StoryWeaver.nextRequirementTitle(progressStore: progressStore)) to unlock your first story.")
-                .font(.system(size: 15, weight: .medium, design: .rounded))
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    private func startNewStory() {
+        guard let story = StoryWeaver.generate(progressStore: progressStore) else { return }
+        library.save(story)
+        Haptics.shared.tap()
+        pageIndex = 0
+        openStory = story
     }
+
+    private func openSavedStory(_ story: Story) {
+        Haptics.shared.tap()
+        pageIndex = 0
+        openStory = story
+    }
+
+    // MARK: - Reading
 
     private func pageView(_ story: Story) -> some View {
         let page = story.pages[pageIndex]
@@ -143,11 +243,11 @@ struct StorybookView: View {
                 if isLastPage {
                     Button {
                         Voice.shared.stop()
-                        onDismiss()
+                        openStory = nil
                     } label: {
                         Image(systemName: "checkmark.circle.fill").font(.system(size: 34))
                     }
-                    .accessibilityLabel("Finish storybook")
+                    .accessibilityLabel("Back to the shelf")
                 } else {
                     Button {
                         goToPage(pageIndex + 1)
@@ -188,7 +288,7 @@ struct StorybookView: View {
     }
 
     private func goToPage(_ newIndex: Int) {
-        guard let story, newIndex >= 0, newIndex < story.pages.count else { return }
+        guard let openStory, newIndex >= 0, newIndex < openStory.pages.count else { return }
         Haptics.shared.tap()
         Voice.shared.stop()
         pageIndex = newIndex

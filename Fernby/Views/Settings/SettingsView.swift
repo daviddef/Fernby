@@ -51,6 +51,7 @@ struct SettingsView: View {
                 Button("Delete", role: .destructive) {
                     ProgressStore.shared.resetActiveProfileData()
                     SessionLog.shared.deleteAll()
+                    StoryLibrary.shared.deleteAll()
                     showDeleteDone = true
                 }
                 Button("Cancel", role: .cancel) {}
